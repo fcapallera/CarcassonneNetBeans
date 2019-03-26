@@ -1,15 +1,15 @@
 import java.util.*;
 
 public class Construccio {
-    protected Set<Peça> _peces = new HashSet<>();
-    protected HashMap<String,Integer> _seguidors = new HashMap<>();
-    protected HashSet<Integer> _pendents = new HashSet<>();
+    protected Set<Regio> _regions = new HashSet<>();
+    protected Map<String,Integer> _seguidors = new HashMap<>();
+    protected Set<Integer> _pendents = new HashSet<>();
 
-    public Construccio(Peça peça){
-        _peces.add(peça);
+    public Construccio(Regio regio){
+        _regions.add(regio);
     }
 
-    public int puntuar(){return _peces.size();}
+    public int puntuar(){return _regions.size();}
 
     public List<String> quiPuntua(){
         Iterator it = _seguidors.entrySet().iterator();
@@ -28,7 +28,7 @@ public class Construccio {
     }
 
     public void fusionar(Construccio c){
-        _peces.addAll(c.get_peces());
+        _regions.addAll(c.get_regions());
         Iterator it = c.get_seguidors().entrySet().iterator();
         while(it.hasNext()){
             Map.Entry pair = (Map.Entry)it.next();
@@ -40,20 +40,20 @@ public class Construccio {
         }
     }
 
-    public void addPeça(Peça peça){
-        _peces.add(peça);
+    public void addRegio(Regio regio){
+        _regions.add(regio);
 
     }
 
-    public boolean contePeça(Peça peça){
-        return _peces.contains(peça);
+    public boolean conteRegio(Regio regio){
+        return _regions.contains(regio);
     }
 
-    public Set<Peça> get_peces() {
-        return _peces;
+    public Set<Regio> get_regions() {
+        return _regions;
     }
 
-    public HashMap<String, Integer> get_seguidors() {
+    public Map<String, Integer> get_seguidors() {
         return _seguidors;
     }
 }

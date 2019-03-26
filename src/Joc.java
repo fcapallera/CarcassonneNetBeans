@@ -61,11 +61,12 @@ public class Joc {
         //Afegim les peces al stack
         if(!error){
             Iterator it = peces.entrySet().iterator();
+            int nReg = 0;
             while(it.hasNext()){
                 Map.Entry pair = (Map.Entry)it.next();
                 for(int i=0;i<(Integer)pair.getValue();i++){
                     Peça p = new Peça((String)pair.getKey());
-
+                    nReg += p.afegirRegions(nReg);
                     _peces.push(p);
                 }
             }

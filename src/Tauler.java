@@ -29,43 +29,39 @@ public class Tauler {
             if(_tauler.containsKey(peça.hashCode()+hashKeyAdj[i])){
                 Peça adj = _tauler.get(peça.hashCode()+hashKeyAdj[i]);
                 adjacents.add(adj);
-                adj.setPeçaAdjacent(peça,0);
+                adj.setPeçaAdjacent(peça,(i+2)%4);
             } else adjacents.add(null);
         }
         peça.set_adjacents(adjacents);
-        afegirConnexioVila(peça);
+        
+        Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
+        List<Regio> regions = peça.get_regions();
+        if(peça.centre()=='V' || peça.centre()=='E'){
+            List<Integer> indexFusio = new ArrayList<>();
+            Regio vila = regions.get(indexs.get("V").get(0));
+            for(int i : indexs.get("V")){
+                if(adjacents.get(i)!=null) indexFusio.add(indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)));
+            }
+            Construccio actual = new Construccio(vila);
+            _connexions.get("vila").add(actual);
+            for(int i : indexFusio){
+                actual.fusionar(_connexions.get("vila").get(i));
+            }
+            for(int i : indexFusio){
+                _connexions.get("vila").remove(i);
+            }
+        }
     }
 
     public void afegirConnexioVila(Peça peça){
         //Pot connectar dues viles
-        if(peça.centre()=='V' || peça.centre()=='E'){
-            List<Peça> connexes = peça.adjacenciesConnexes('V');
-            //No esta connectada amb cap Vila
-            if(connexes.size()==0) _connexions.get("vila").add(new Vila(peça));
-            else{
-                List<Integer> vilesFusionar = new ArrayList<>();
-                for(Peça p : connexes) vilesFusionar.add(indexOfConstruccio("vila",p));
-                for(int i=1;i<vilesFusionar.size();i++){
-                    _connexions.get("vila").get(0).fusionar(_connexions.get("vila").get(i));
-                }
-                for(int i=1;i<vilesFusionar.size();i++){
-                    _connexions.get("vila").remove(i);
-                }
-                _connexions.get("vila").get(0).addPeça(peça);
-            }
-        }
-        List<Peça> connexes = peça.adjacenciesConnexes('V');
-        if(connexes.size()==0) _connexions.get("vila").add(new Vila(peça));
-        else{
-            List<Integer> indexConnexio = new ArrayList<>();
-            for(Peça p : connexes) indexConnexio.add(indexOfConstruccio("vila",p));
-        }
+        
     }
 
-    public int indexOfConstruccio(String constr, Peça peça){
+    public int indexOfConstruccio(String constr, Regio regio){
         int i = 0;
         while(i<_connexions.get(constr).size()){
-            if(_connexions.get(constr).get(i).contePeça(peça)) return i;
+            if(_connexions.get(constr).get(i).conteRegio(regio)) return i;
             i++;
         }
         return -1;
