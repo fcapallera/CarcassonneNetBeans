@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Stream;
 
 public class Construccio {
     protected Set<Regio> _regions = new HashSet<>();
@@ -29,20 +30,26 @@ public class Construccio {
 
     public void fusionar(Construccio c){
         _regions.addAll(c.get_regions());
-        Iterator it = c.get_seguidors().entrySet().iterator();
-        while(it.hasNext()){
-            Map.Entry pair = (Map.Entry)it.next();
+        for (Map.Entry pair : c.get_seguidors().entrySet()) {
             String clau = (String) pair.getKey();
             if(_seguidors.containsKey(clau)){
                 _seguidors.put(clau,_seguidors.get(clau)+(Integer)pair.getValue());
             }
             else _seguidors.put(clau,(Integer)pair.getValue());
         }
+        Set<Integer> interseccio = new HashSet<>(_pendents); 
+        interseccio.retainAll(c.get_pendents());
+        _pendents.addAll(c.get_pendents());
+        _pendents.removeAll(interseccio);
     }
 
     public void addRegio(Regio regio){
         _regions.add(regio);
 
+    }
+    
+    public void addPendent(Integer pendent){
+        _pendents.add(pendent);
     }
 
     public boolean conteRegio(Regio regio){
@@ -55,5 +62,9 @@ public class Construccio {
 
     public Map<String, Integer> get_seguidors() {
         return _seguidors;
+    }
+    
+    public Set<Integer> get_pendents(){
+        return _pendents;
     }
 }

@@ -1,9 +1,9 @@
 import java.util.*;
 
 public class Tauler {
-    private HashMap<Integer,Peça> _tauler = new HashMap<>();
-    private HashMap<String, ArrayList<Construccio>> _connexions = new HashMap<>();
-    private HashSet<Integer> _disponibles = new HashSet<>();
+    private Map<Integer,Peça> _tauler = new HashMap<>();
+    private Map<String, ArrayList<Construccio>> _connexions = new HashMap<>();
+    private Set<Integer> _disponibles = new HashSet<>();
     private int _maxX = 0;
     private int _minX = 0;
     private int _maxY = 0;
@@ -37,51 +37,54 @@ public class Tauler {
         Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
         List<Regio> regions = peça.get_regions();
         if(peça.centre()=='V' || peça.centre()=='E'){
-            List<Integer> indexFusio = new ArrayList<>();
             Regio vila = regions.get(indexs.get("V").get(0));
             Construccio actual = new Vila(vila);
-            _connexions.get("vila").add(actual);
             for(int i : indexs.get("V")){
                 if(adjacents.get(i)!=null){
-                    int aux = indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4));
-                    indexFusio.add(aux);
-                    actual.fusionar(_connexions.get("vila").get(aux));
+                    Construccio aux = buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4));
+                    actual.fusionar(aux);
+                    _connexions.get("vila").remove(aux);
                 }
             }
-            
-            for(int i : indexFusio){
-                actual.fusionar(_connexions.get("vila").get(i));
-            }
-            for(int i : indexFusio){
-                _connexions.get("vila").remove(i);
-            }
+            _connexions.get("vila").add(actual);
         }
         else{
             for(int i : indexs.get("V")){
-                if(adjacents.get(i)==null) _connexions.get("vila").add(new Construccio(peça.getRegio(i)));
-                else _connexions.get("vila").get(indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)));
+                if(adjacents.get(i)==null) _connexions.get("vila").add(new Vila(peça.getRegio(i)));
+                else buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
             }
         }
         if(peça.centre()=='X'){
             for(int i : indexs.get("C")){
-                if(adjacents.get(i)==null) _connexions.get("cami").add(new Construccio(peça.getRegio(i)));
-                else _connexions.get("cami").get(indexOfConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)));
+                if(adjacents.get(i)==null) _connexions.get("cami").add(new Cami(peça.getRegio(i)));
+                else buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
+            }
+        }
+        else{
+            if(indexs.get("C").size()>0){
+                Regio cami = regions.get(indexs.get("C").get(0));
+                Construccio actual = new Cami(cami);
+                for(int i : indexs.get("C")){
+                    if(adjacents.get(i)!=null){
+                        Construccio aux = buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4));
+                        actual.fusionar(aux);
+                        _connexions.get("cami").remove(aux);
+                    }
+                }
+                _connexions.get("cami").add(actual);
             }
         }
     }
 
-    public void afegirConnexioVila(Peça peça){
-        //Pot connectar dues viles
-        
-    }
 
-    public int indexOfConstruccio(String constr, Regio regio){
+    public Construccio buscarConstruccio(String constr, Regio regio){
         int i = 0;
         while(i<_connexions.get(constr).size()){
-            if(_connexions.get(constr).get(i).conteRegio(regio)) return i;
+            Construccio actual = _connexions.get(constr).get(i);
+            if(actual.conteRegio(regio)) return actual;
             i++;
         }
-        return -1;
+        return null;
     }
 
     public Peça getPeça(int x, int y){
