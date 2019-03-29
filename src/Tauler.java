@@ -39,16 +39,33 @@ public class Tauler {
         if(peça.centre()=='V' || peça.centre()=='E'){
             List<Integer> indexFusio = new ArrayList<>();
             Regio vila = regions.get(indexs.get("V").get(0));
-            for(int i : indexs.get("V")){
-                if(adjacents.get(i)!=null) indexFusio.add(indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)));
-            }
-            Construccio actual = new Construccio(vila);
+            Construccio actual = new Vila(vila);
             _connexions.get("vila").add(actual);
+            for(int i : indexs.get("V")){
+                if(adjacents.get(i)!=null){
+                    int aux = indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4));
+                    indexFusio.add(aux);
+                    actual.fusionar(_connexions.get("vila").get(aux));
+                }
+            }
+            
             for(int i : indexFusio){
                 actual.fusionar(_connexions.get("vila").get(i));
             }
             for(int i : indexFusio){
                 _connexions.get("vila").remove(i);
+            }
+        }
+        else{
+            for(int i : indexs.get("V")){
+                if(adjacents.get(i)==null) _connexions.get("vila").add(new Construccio(peça.getRegio(i)));
+                else _connexions.get("vila").get(indexOfConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)));
+            }
+        }
+        if(peça.centre()=='X'){
+            for(int i : indexs.get("C")){
+                if(adjacents.get(i)==null) _connexions.get("cami").add(new Construccio(peça.getRegio(i)));
+                else _connexions.get("cami").get(indexOfConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)));
             }
         }
     }
