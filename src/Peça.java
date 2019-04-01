@@ -74,12 +74,12 @@ public class Peça implements Comparable<Peça>{
     }
 
     public Peça getPeçaAdjacent(int a){
-        if(a > 0 || a < 4) throw new IndexOutOfBoundsException("Index "+a+" is out of bounds");
+        if(a < 0 || a > 4) throw new IndexOutOfBoundsException("Index "+a+" is out of bounds");
         else return _adjacents.get(a);
     }
     
     public Regio getRegio(int r){
-        if(r > 0 || r < 4) throw new IndexOutOfBoundsException("Index "+r+" is out of bounds");
+        if(r < 0 || r > 4) throw new IndexOutOfBoundsException("Index "+r+" is out of bounds");
         else return _regions.get(r);
     }
     
