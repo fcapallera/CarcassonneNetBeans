@@ -30,12 +30,16 @@ public class Tauler {
                 Peça adj = _tauler.get(peça.hashCode()+hashKeyAdj[i]);
                 adjacents.add(adj);
                 adj.setPeçaAdjacent(peça,(i+2)%4);
+                //Comprovar monestirs adjacents
+                if(adj.centre()=='M'){
+                    for(Construccio m : _connexions.get("monestir")) m.removePendent(peça.hashCode());
+                }
             } else adjacents.add(null);
         }
         peça.set_adjacents(adjacents);
         
         Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
-        List<Regio> regions = peça.get_regions();
+        List<Regio> regions = peça.get_regions();        
         if(peça.centre()=='V' || peça.centre()=='E'){
             Regio vila = regions.get(indexs.get("V").get(0));
             Construccio actual = new Vila(vila);
@@ -48,6 +52,11 @@ public class Tauler {
                 else actual.addPendent(adjacents.get(i).hashCode());
             }
             _connexions.get("vila").add(actual);
+        }
+        else if(peça.centre()=='M'){
+            Monestir monestir = new Monestir(null);
+            monestir.set_peça(peça);
+            _connexions.get("monestir").add(monestir);
         }
         else{
             for(int i : indexs.get("V")){
@@ -83,7 +92,7 @@ public class Tauler {
                 }
                 _connexions.get("cami").add(actual);
             }
-        }
+        } 
     }
 
 

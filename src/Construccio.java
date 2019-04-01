@@ -48,6 +48,10 @@ public class Construccio {
     public void addPendent(Integer pendent){
         _pendents.add(pendent);
     }
+    
+    public void removePendent(Integer pendent){
+        _pendents.remove(pendent);
+    }
 
     public boolean conteRegio(Regio regio){
         return _regions.contains(regio);
