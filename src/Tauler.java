@@ -45,18 +45,27 @@ public class Tauler {
                     actual.fusionar(aux);
                     _connexions.get("vila").remove(aux);
                 }
+                else actual.addPendent(adjacents.get(i).hashCode());
             }
             _connexions.get("vila").add(actual);
         }
         else{
             for(int i : indexs.get("V")){
-                if(adjacents.get(i)==null) _connexions.get("vila").add(new Vila(peça.getRegio(i)));
+                if(adjacents.get(i)==null){
+                    Construccio vila = new Vila(peça.getRegio(i));
+                    vila.addPendent(adjacents.get(i).hashCode());
+                    _connexions.get("vila").add(vila);
+                }
                 else buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
             }
         }
         if(peça.centre()=='X'){
             for(int i : indexs.get("C")){
-                if(adjacents.get(i)==null) _connexions.get("cami").add(new Cami(peça.getRegio(i)));
+                if(adjacents.get(i)==null){
+                    Construccio cami = new Cami(peça.getRegio(i));
+                    cami.addPendent(adjacents.get(i).hashCode());
+                    _connexions.get("cami").add(cami);
+                }
                 else buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
             }
         }
@@ -70,6 +79,7 @@ public class Tauler {
                         actual.fusionar(aux);
                         _connexions.get("cami").remove(aux);
                     }
+                    else actual.addPendent(adjacents.get(i).hashCode());
                 }
                 _connexions.get("cami").add(actual);
             }

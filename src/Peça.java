@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -11,17 +12,38 @@ public class Peça implements Comparable<Peça>{
     int _y;
     private String _codi;
     private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));
-    private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null));
-    private Map<String,ArrayList<Integer>> _indexs = new HashMap<>();
+    final private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null));
+    final private Map<String,ArrayList<Integer>> _indexs = new HashMap<>();
 
     @Override
     public int compareTo(Peça other){
-        return new Integer(this.hashCode()).compareTo(new Integer(other.hashCode()));
+        return new Integer(this.hashCode()).compareTo(other.hashCode());
     }
 
     @Override
     public int hashCode() {
         return _x*100+_y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Peça other = (Peça) obj;
+        if (this._x != other._x) {
+            return false;
+        }
+        if (this._y != other._y) {
+            return false;
+        }
+        return Objects.equals(this._codi, other._codi);
     }
 
 
@@ -43,7 +65,6 @@ public class Peça implements Comparable<Peça>{
     }
 
     public void rotarClockWise(){
-        //this.getGraphic().setRotate(-90);
         String nouCodi = ""+_codi.charAt(0)+_codi.charAt(4)+_codi.charAt(1)+_codi.charAt(2)+_codi.charAt(3);
         _codi = nouCodi;
     }
@@ -73,30 +94,30 @@ public class Peça implements Comparable<Peça>{
             Regio v = new Regio(nReg,c=='E');
             n++;
             for(int i=1;i<5;i++){
-                if(_codi.charAt(i)=='V') _regions.add(i-1, v);
+                if(_codi.charAt(i)=='V') _regions.set(i-1, v);
             }
         }
         else{
             for(int i=1;i<5;i++){
                 if(_codi.charAt(i)=='V'){
-                    Regio v = new Regio(nReg+(n++));
-                    _regions.add(i-1, v);
+                    Regio v = new Regio(nReg+(n++),this);
+                    _regions.set(i-1, v);
                 }
             }
         }
         if(c == 'X'){
             for(int i=1;i<5;i++){
                 if(_codi.charAt(i)=='C'){
-                    Regio p = new Regio(nReg+(n++));
-                    _regions.add(i-1, p);
+                    Regio p = new Regio(nReg+(n++),this);
+                    _regions.set(i-1, p);
                 }
             }
         }
         else{
             if(_codi.indexOf('C')>0){
-                Regio p = new Regio(nReg+(n++));
+                Regio p = new Regio(nReg+(n++),this);
                 for(int i=1;i<5;i++){
-                    if(_codi.charAt(i)=='C') _regions.add(i-1, p);
+                    if(_codi.charAt(i)=='C') _regions.set(i-1, p);
                 }
             }
         }
@@ -104,7 +125,7 @@ public class Peça implements Comparable<Peça>{
     }
 
     public void setPeçaAdjacent(Peça peça, int orientacio){
-        _adjacents.add(peça);
+        _adjacents.set(orientacio,peça);
     }
 
     public char getRegioAdjacent(int a){

@@ -2,9 +2,11 @@ public class Regio implements Comparable<Regio> {
     private int _id;
     private String _seguidor = "";
     private boolean _escut = false;
+    private Peça _peça;
 
-    public Regio(int _id) {
+    public Regio(int _id, Peça peça) {
         this._id = _id;
+        this._peça = peça;
     }
     
     public Regio(int _id, boolean escut) {
@@ -27,5 +29,9 @@ public class Regio implements Comparable<Regio> {
     
     public boolean hiHaEscut(){
         return _escut;
+    }
+    
+    public Peça get_peça(){
+        return _peça;
     }
 }

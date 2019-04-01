@@ -37,10 +37,7 @@ public class Construccio {
             }
             else _seguidors.put(clau,(Integer)pair.getValue());
         }
-        Set<Integer> interseccio = new HashSet<>(_pendents); 
-        interseccio.retainAll(c.get_pendents());
-        _pendents.addAll(c.get_pendents());
-        _pendents.removeAll(interseccio);
+        _pendents.retainAll(c.get_pendents());
     }
 
     public void addRegio(Regio regio){
