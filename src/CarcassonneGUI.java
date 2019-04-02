@@ -3,20 +3,36 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import javafx.scene.image.Image ;
 import static java.lang.Double.SIZE;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.AccessibleRole;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -26,7 +42,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
+import static jdk.nashorn.internal.objects.NativeRegExp.source;
 
 
 /**
@@ -34,19 +52,38 @@ import javafx.stage.Stage;
  * @author usuario
  */
 public class CarcassonneGUI extends Application {
+    private int numAux;
+    private int col;
+    private int row;
+    
+    
     
     private BorderPane root;
+    private GridPane taul;
+    private GridPane dreta;
+    private Button rota;
+    private ImageView pila;
     private Joc j;
+    private int rotacioPila; 
     
     @Override
     public void start(Stage primaryStage) {
+        row = 9;
+        col = 8;
+        numAux = 690;
         root = new BorderPane();
-        GridPane grid = getLeftGridPane();
-        root.setLeft(grid);
-        root.setAlignment(grid,Pos.CENTER);
-        BorderPane.setMargin(grid, new Insets(30, 10, 10, 50));
-        root.setRight(getRightLabel());
-        root.setCenter(getCenterGridPane());
+        taul = getCenterGridPane();
+        dreta = getRightGridPane();
+        root.setAlignment(taul,Pos.CENTER);
+        BorderPane.setAlignment(dreta,Pos.CENTER);
+        BorderPane.setMargin(taul, new Insets(30, 10, 10, 50));
+        BorderPane.setMargin(dreta, new Insets(10, 50, 10, 10));
+        root.setRight(dreta);
+        root.setCenter(taul);
+        root.setLeft(getLeftGridPane());
+        rotacioPila = 0;
+        
+        
         
         
        
@@ -58,6 +95,142 @@ public class CarcassonneGUI extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        rota.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                pila.setRotate(pila.getRotate() + 90);
+                if(rotacioPila != 3){
+                    rotacioPila ++;
+                }
+                else{
+                    rotacioPila = 0;
+                }
+            }
+        });
+        
+        
+        //Drag detected event handler is used for adding drag functionality to the boat node
+        pila.setOnDragDetected(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent event){
+                //Drag was detected, start drap-and-drop gesture
+                //Allow any transfer node
+                Dragboard db = pila.startDragAndDrop(TransferMode.ANY);
+                //Put ImageView on dragboard
+                ClipboardContent cbContent = new ClipboardContent();
+                Image snap = pila.snapshot(null, null);
+                Image image = pila.getImage();
+                cbContent.putImage(image);
+                db.setContent(cbContent);
+                db.setDragView(image);
+                event.consume();
+                pila.setVisible(false);
+            }
+        });
+        
+        //Drag over event handler is used for the receiving node to allow movement
+        taul.setOnDragOver(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                //data is dragged over to target
+                //accept it only if it is not dragged from the same node
+                //and if it has image data
+                if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
+                    //allow for moving
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            }
+        });
+
+        //Drag entered changes the appearance of the receiving node to indicate to the player that they can place there
+        taul.setOnDragEntered(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                //The drag-and-drop gesture entered the target
+                //show the user that it is an actual gesture target
+                if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
+                    //taul.setOpacity(0.7);
+                    Node node = event.getPickResult().getIntersectedNode();
+                    if(node != taul){
+                            Integer cIndex = GridPane.getColumnIndex(node);
+                            Integer rIndex = GridPane.getRowIndex(node);
+                            int x = cIndex == null ? 0 : cIndex;
+                            int y = rIndex == null ? 0 : rIndex;
+                            node.setOpacity(0.7);
+                    }
+                    
+                    pila.setVisible(false);
+                }
+                event.consume();
+            }
+        });
+        
+        //Drag exited reverts the appearance of the receiving node when the mouse is outside of the node
+        taul.setOnDragExited(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                //mouse moved away, remove graphical cues
+                pila.setVisible(true);
+                //taul.setOpacity(1);
+
+                event.consume();
+            }
+        });
+        
+        //Drag dropped draws the image to the receiving node
+        taul.setOnDragDropped(new EventHandler<DragEvent>() {
+            public void handle(DragEvent event) {
+                //Data dropped
+                //If there is an image on the dragboard, read it and use it
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                Node node = event.getPickResult().getIntersectedNode();
+                if(node != taul && db.hasImage()){
+                        Integer cIndex = GridPane.getColumnIndex(node);
+                        Integer rIndex = GridPane.getRowIndex(node);
+                        int x = cIndex == null ? 0 : cIndex;
+                        int y = rIndex == null ? 0 : rIndex;
+                        ImageView image = new ImageView(db.getImage());
+                        image.setRotate(image.getRotate() + (90*(rotacioPila)));
+                        if(row >= col){
+                            image.setFitHeight(numAux/row);
+                            image.setFitWidth(numAux/row);
+                        }
+                        else{
+                            image.setFitHeight(numAux/col);
+                            image.setFitWidth(numAux/col);
+                        }
+                        // TODO: set image size; use correct column/row span
+                        taul.add(image, x, y, 1, 1);
+                        success = true;
+                }
+                //let the source know whether the image was successfully transferred and used
+                event.setDropCompleted(success);
+
+
+                event.consume();
+            }
+        });
+        
+        pila.setOnDragDone(new EventHandler<DragEvent>() {
+        public void handle(DragEvent event) {
+            //the drag and drop gesture has ended
+            //if the data was successfully moved, clear it
+            if(event.getTransferMode() == TransferMode.MOVE){
+                pila.setVisible(false);
+            }
+            event.consume();
+        }
+        });
+        
+        
+
+    }
+    
+    private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
+                return node;
+            }
+        }
+        return null;
     }
     
     public GridPane getLeftGridPane(){
@@ -110,13 +283,22 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
-    public Label getRightLabel(){
-        Label res = new Label("Right Label");
-        res.setPrefWidth(SIZE*5);
-        res.prefHeightProperty().bind(root.heightProperty());
-        res.setStyle("-fx-border-style: dotted; -fx-border-width: 0 0 0 1;-fx-font-weight:bold;");
-        res.setAlignment(Pos.BASELINE_CENTER);
-        return res;
+    public GridPane getRightGridPane(){
+        //Carreguem la peça de dalt de tot de l'stack
+        GridPane grid = new GridPane();
+        grid.setHgap(0);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(0, 0, 0, 0));
+        pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/CCFCF.png")));
+        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png")));
+        rota = new Button();
+        rota.setGraphic(aux);
+        grid.add(pila, 0, 0);
+        grid.add(rota,0,1);
+        grid.setAlignment(Pos.CENTER);
+        pila.setFitHeight(numAux/5);
+        pila.setFitWidth(numAux/5);
+        return grid;
     }
     
     public GridPane getCenterGridPane(){
@@ -132,9 +314,7 @@ public class CarcassonneGUI extends Application {
                 grid.add(category, i, j);
             }
         }*/
-        int row = 8;
-        int col = 9;
-        int numAux = 690;
+        
         for(int i = 0; i < col; i++){
             for(int j = 0; j < row; j++){
                 ImageView imageChart;
@@ -155,13 +335,7 @@ public class CarcassonneGUI extends Application {
                 grid.add(imageChart, i, j); 
             }
         }
-
-        
-        
-
-        
         grid.setAlignment(Pos.CENTER);
-
         return grid;
     }
     /**
