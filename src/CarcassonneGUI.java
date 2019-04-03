@@ -42,6 +42,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import static jdk.nashorn.internal.objects.NativeRegExp.source;
@@ -104,7 +105,7 @@ public class CarcassonneGUI extends Application {
                 }
                 else{
                     rotacioPila = 0;
-                }
+                }                
             }
         });
         
@@ -117,13 +118,16 @@ public class CarcassonneGUI extends Application {
                 Dragboard db = pila.startDragAndDrop(TransferMode.ANY);
                 //Put ImageView on dragboard
                 ClipboardContent cbContent = new ClipboardContent();
-                Image snap = pila.snapshot(null, null);
+                Image snap = pila.snapshot(new SnapshotParameters(), null);
                 Image image = pila.getImage();
                 cbContent.putImage(image);
                 db.setContent(cbContent);
-                db.setDragView(image);
                 event.consume();
                 pila.setVisible(false);
+            }
+
+            private Rotate newRotate() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
         
@@ -136,7 +140,23 @@ public class CarcassonneGUI extends Application {
                 if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
                     //allow for moving
                     event.acceptTransferModes(TransferMode.MOVE);
-                }
+                    Node node = event.getPickResult().getIntersectedNode();
+                    if(node != taul){
+                            Integer cIndex = GridPane.getColumnIndex(node);
+                            Integer rIndex = GridPane.getRowIndex(node);
+                            int x = cIndex == null ? 0 : cIndex;
+                            int y = rIndex == null ? 0 : rIndex;
+                            node.setOpacity(0.7);
+
+                            node.setOnDragExited(new EventHandler<DragEvent>() {
+                                public void handle(DragEvent event) {
+                                    //mouse moved away, remove graphical cues
+                                    node.setOpacity(1);
+                                    event.consume();
+                                }
+                            });
+                    }
+                }                  
                 event.consume();
             }
         });
@@ -148,14 +168,7 @@ public class CarcassonneGUI extends Application {
                 //show the user that it is an actual gesture target
                 if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
                     //taul.setOpacity(0.7);
-                    Node node = event.getPickResult().getIntersectedNode();
-                    if(node != taul){
-                            Integer cIndex = GridPane.getColumnIndex(node);
-                            Integer rIndex = GridPane.getRowIndex(node);
-                            int x = cIndex == null ? 0 : cIndex;
-                            int y = rIndex == null ? 0 : rIndex;
-                            node.setOpacity(0.7);
-                    }
+                    
                     
                     pila.setVisible(false);
                 }
@@ -198,7 +211,7 @@ public class CarcassonneGUI extends Application {
                             image.setFitWidth(numAux/col);
                         }
                         // TODO: set image size; use correct column/row span
-                        taul.add(image, x, y, 1, 1);
+                        taul.add(image, x, y);
                         success = true;
                 }
                 //let the source know whether the image was successfully transferred and used
