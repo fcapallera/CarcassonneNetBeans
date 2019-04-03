@@ -92,7 +92,7 @@ public class Tauler {
                 }
                 _connexions.get("cami").add(actual);
             }
-        } 
+        }
     }
 
 
