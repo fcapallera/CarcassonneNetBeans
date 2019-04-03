@@ -51,7 +51,6 @@ public class CarcassonneGUI extends Application {
     private Stack<Peça> _peces;
     private ArrayList<Jugador> _jugadors;
     private Tauler _tauler;
-    private CarcassonneGUI _gui;
 
 
     public void init(String arxiu){
