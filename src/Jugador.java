@@ -12,4 +12,14 @@ public class Jugador {
     public void setCpu() {
         this._cpu = true;
     }
+    
+    public boolean get_cpu(){
+        return _cpu;
+    }
+    
+    public void jugarCpu(Tauler tauler){
+        for(int i=0;i<4;i++){
+            
+        }
+    }
 }
