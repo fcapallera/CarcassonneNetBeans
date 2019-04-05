@@ -52,75 +52,7 @@ import javafx.stage.Stage;
 public class CarcassonneGUI extends Application {
     private int numAux;
     private int col;
-    private int row;
-    
-    static final String PROVES_SRC = "src/proves/";
-
-    private Stack<Peça> _peces;
-    private ArrayList<Jugador> _jugadors;
-    private Tauler _tauler;
-    private int _torn = 0;
-    private boolean _jugat = false;
-
-    public void init(String arxiu){
-        File f = new File(PROVES_SRC+arxiu+".txt");
-        HashMap<String,Integer> peces = new HashMap<>();
-        boolean error = false;
-        try {
-            Scanner lector = new Scanner(f);
-
-            //Llegim els jugadors
-            if(lector.hasNext() && lector.next().equals("nombre_jugadors")){
-                int njugs = lector.nextInt();
-                for(int i=0;i<njugs;i++) _jugadors.add(new Jugador(i));
-                if(lector.hasNext() && lector.next().equals("jugadors_cpu")){
-                    while(lector.hasNextInt()){
-                        int j_cpu = lector.nextInt();
-                        _jugadors.get(j_cpu-1).setCpu();
-                    }
-                } else error = true;
-            } else error = true;
-
-
-            //Llegim les peces
-            if(lector.hasNext() && lector.next().equals("rajoles")){
-                String codi;
-                while(!(codi = lector.next()).equals("#")) {
-                    Integer nombre = lector.nextInt();
-                    peces.put(codi, nombre);
-                }
-            } else error = true;
-
-            //Llegim la rajola inicial
-            if(lector.hasNext() && lector.next().equals("rajola_inicial")){
-                String inicial = lector.next();
-                peces.put(inicial,peces.get(inicial)-1);
-                _tauler.afegirPeça(new Peça(inicial),0,0);
-            } else error = true;
-
-        } catch (FileNotFoundException e){
-            System.err.println(e);
-        }
-
-        //Afegim les peces al stack
-        if(!error){
-            Iterator it = peces.entrySet().iterator();
-            while(it.hasNext()){
-                Map.Entry pair = (Map.Entry)it.next();
-                for(int i=0;i<(Integer)pair.getValue();i++){
-                    Peça p = new Peça((String)pair.getKey());
-
-                    _peces.push(p);
-                }
-            }
-            Collections.shuffle(_peces);
-        } else System.out.println("Error");
-    }
-    
-    
-    
-    
-    
+    private int row;   
     private BorderPane root;
     private GridPane taul;
     private GridPane dreta;
@@ -130,10 +62,6 @@ public class CarcassonneGUI extends Application {
     
     @Override
     public void start(Stage primaryStage) {
-        _peces = new Stack<>();
-        _jugadors = new ArrayList<>();
-        _tauler = new Tauler(false);
-        init("1");
         row = 3;
         col = 3;
         numAux = 690;
@@ -182,135 +110,7 @@ public class CarcassonneGUI extends Application {
                     rotacioPila = 0;
                 }                
             }
-        });
-        
-        
-        //Drag detected event handler is used for adding drag functionality to the boat node
-        pila.setOnDragDetected(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent event){
-                //Drag was detected, start drap-and-drop gesture
-                //Allow any transfer node
-                Dragboard db = pila.startDragAndDrop(TransferMode.ANY);
-                //Put ImageView on dragboard
-                ClipboardContent cbContent = new ClipboardContent();
-                Image snap = pila.snapshot(new SnapshotParameters(), null);
-                Image image = pila.getImage();
-                cbContent.putImage(image);
-                db.setContent(cbContent);
-                event.consume();
-                pila.setVisible(false);
-            }
-
-            private Rotate newRotate() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        });
-        
-        //Drag over event handler is used for the receiving node to allow movement
-        taul.setOnDragOver(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                //data is dragged over to target
-                //accept it only if it is not dragged from the same node
-                //and if it has image data
-                if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
-                    //allow for moving
-                    event.acceptTransferModes(TransferMode.MOVE);
-                    Node node = event.getPickResult().getIntersectedNode();
-                    if(node != taul){
-                            Integer cIndex = GridPane.getColumnIndex(node);
-                            Integer rIndex = GridPane.getRowIndex(node);
-                            int x = cIndex == null ? 0 : cIndex;
-                            int y = rIndex == null ? 0 : rIndex;
-                            node.setOpacity(0.7);
-
-                            node.setOnDragExited(new EventHandler<DragEvent>() {
-                                public void handle(DragEvent event) {
-                                    //mouse moved away, remove graphical cues
-                                    node.setOpacity(1);
-                                    event.consume();
-                                }
-                            });
-                    }
-                }                  
-                event.consume();
-            }
-        });
-
-        //Drag entered changes the appearance of the receiving node to indicate to the player that they can place there
-        taul.setOnDragEntered(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                //The drag-and-drop gesture entered the target
-                //show the user that it is an actual gesture target
-                if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
-                    //taul.setOpacity(0.7);
-                    
-                    
-                    pila.setVisible(false);
-                }
-                event.consume();
-            }
-        });
-        
-        //Drag exited reverts the appearance of the receiving node when the mouse is outside of the node
-        taul.setOnDragExited(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                //mouse moved away, remove graphical cues
-                pila.setVisible(true);
-                //taul.setOpacity(1);
-
-                event.consume();
-            }
-        });
-        
-        //Drag dropped draws the image to the receiving node
-        taul.setOnDragDropped(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                //Data dropped
-                //If there is an image on the dragboard, read it and use it
-                Dragboard db = event.getDragboard();
-                boolean success = false;
-                Node node = event.getPickResult().getIntersectedNode();
-                if(node != taul && db.hasImage()){
-                        Integer cIndex = GridPane.getColumnIndex(node);
-                        Integer rIndex = GridPane.getRowIndex(node);
-                        int x = cIndex == null ? 0 : cIndex;
-                        int y = rIndex == null ? 0 : rIndex;
-                        ImageView image = new ImageView(db.getImage());
-                        image.setRotate(image.getRotate() + (90*(rotacioPila)));
-                        if(row >= col){
-                            image.setFitHeight(numAux/row);
-                            image.setFitWidth(numAux/row);
-                        }
-                        else{
-                            image.setFitHeight(numAux/col);
-                            image.setFitWidth(numAux/col);
-                        }
-                        // TODO: set image size; use correct column/row span
-                        taul.add(image, x, y);
-                        success = true;
-                }
-                //let the source know whether the image was successfully transferred and used
-                event.setDropCompleted(success);
-                _jugat = success;
-
-
-                event.consume();
-            }
-        });
-        
-        pila.setOnDragDone(new EventHandler<DragEvent>() {
-        public void handle(DragEvent event) {
-            //the drag and drop gesture has ended
-            //if the data was successfully moved, clear it
-            if(event.getTransferMode() == TransferMode.MOVE){
-                pila.setVisible(false);
-            }
-            event.consume();
-        }
-        });
-        
-        
-
+        });       
     }
     
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -779,19 +579,6 @@ public class CarcassonneGUI extends Application {
             }
         });
         
-    }
-
-    public void torn(int jugadorActual){
-        int jugActual = (_torn+1)%_jugadors.size();
-        EventHandler<MouseEvent> handler = MouseEvent::consume;
-        if(_jugadors.get(jugActual).get_cpu()){
-            taul.addEventFilter(MouseEvent.ANY, handler);
-            rota.addEventFilter(MouseEvent.ANY, handler);
-        }
-        else{
-            taul.removeEventFilter(MouseEvent.ANY, handler);
-            rota.removeEventFilter(MouseEvent.ANY, handler);
-        }
     }
     
 
