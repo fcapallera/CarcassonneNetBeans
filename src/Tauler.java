@@ -15,13 +15,25 @@ public class Tauler {
         _connexions.put("monestir", new ArrayList<>());
         if(camperols) _connexions.put("camp", new ArrayList<>());
     }
-
+    
+    public Map<Integer,Peça> getTauler(){
+        return _tauler;
+    }
+    
+    public int getMinX(){
+        return _minX;
+    }
+    
+    public int getMaxY(){
+        return _maxY;
+    }
+    
     public void afegirPeça(Peça peça, int x, int y){
         actualitzarCotes(x,y);
         peça.set_x(x);
         peça.set_y(y);
         _tauler.put(peça.hashCode(),peça);
-
+        
         List<Peça> adjacents = new ArrayList<>();
         int[] hashKeyAdj = {1,100,-1,-100};
 
@@ -39,7 +51,7 @@ public class Tauler {
         peça.set_adjacents(adjacents);
         
         Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
-        List<Regio> regions = peça.get_regions();        
+        List<Regio> regions = peça.get_regions();   
         if(peça.centre()=='V' || peça.centre()=='E'){
             Regio vila = regions.get(indexs.get("V").get(0));
             Construccio actual = new Vila(vila);
@@ -68,6 +80,7 @@ public class Tauler {
                 else buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
             }
         }
+        
         if(peça.centre()=='X'){
             for(int i : indexs.get("C")){
                 if(adjacents.get(i)==null){
@@ -93,6 +106,7 @@ public class Tauler {
                 _connexions.get("cami").add(actual);
             }
         } 
+        
     }
 
 
