@@ -1,7 +1,7 @@
 nombre_jugadors 5
 jugadors_cpu 2 3 5
 rajoles
-CFCVC 7
+CVCFC 7
 XCCCC 4
 MFFFF 2
 VVFFV 6
