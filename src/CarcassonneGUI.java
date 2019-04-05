@@ -368,6 +368,7 @@ public class CarcassonneGUI extends Application {
         System.out.println(x+" "+y);
         Peça p = _tauler.getPeça(getXHash(x),getYHash(y));
         System.out.println(getXHash(x)+" "+getYHash(y));
+        //COMPROVAR PRIMER SI L'ELEMENT ÉS EN EL HASH MAP
         if(!incompatible && x != 0){//0123 NESW
             //COMPROVAR ESQUERRA
             Peça aux = p.getPeçaAdjacent(3);
