@@ -35,7 +35,7 @@ public class Tauler {
         _tauler.put(peça.hashCode(),peça);
         
         List<Peça> adjacents = new ArrayList<>();
-        int[] hashKeyAdj = {100,1,-100,-1};
+        int[] hashKeyAdj = {1,100,-1,-100};
 
         for(int i=0;i<4;i++){
             if(_tauler.containsKey(peça.hashCode()+hashKeyAdj[i])){

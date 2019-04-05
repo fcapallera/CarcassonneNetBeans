@@ -11,6 +11,7 @@ public class Peça implements Comparable<Peça>{
     int _x;
     int _y;
     private String _codi;
+    private int _nRotacions = 0;
     private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));
     final private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null));
     final private Map<String,ArrayList<Integer>> _indexs = new HashMap<>();
@@ -67,6 +68,12 @@ public class Peça implements Comparable<Peça>{
     public void rotarClockWise(){
         String nouCodi = ""+_codi.charAt(0)+_codi.charAt(4)+_codi.charAt(1)+_codi.charAt(2)+_codi.charAt(3);
         _codi = nouCodi;
+        Regio sud = _regions.get(3);
+        for(int i=1;i<4;i++){
+            _regions.set(i,_regions.get(i-1));
+        }
+        _regions.set(0,sud);
+        _nRotacions++;
     }
 
     public boolean esCompatible(Peça peça, int orientacio){
@@ -190,5 +197,9 @@ public class Peça implements Comparable<Peça>{
 
     public void set_y(int _y) {
         this._y = _y;
+    }
+    
+    public int getIndexRotacio(){
+        return _nRotacions % 4;
     }
 }
