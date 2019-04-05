@@ -54,6 +54,8 @@ public class CarcassonneGUI extends Application {
     private Stack<Peça> _peces;
     private ArrayList<Jugador> _jugadors;
     private Tauler _tauler;
+    private int _torn = 0;
+    private boolean _jugat = false;
 
     public void init(String arxiu){
         File f = new File(PROVES_SRC+arxiu+".txt");
@@ -109,6 +111,8 @@ public class CarcassonneGUI extends Application {
             Collections.shuffle(_peces);
         } else System.out.println("Error");
     }
+    
+    
     
     
     
@@ -272,6 +276,7 @@ public class CarcassonneGUI extends Application {
                 }
                 //let the source know whether the image was successfully transferred and used
                 event.setDropCompleted(success);
+                _jugat = success;
 
 
                 event.consume();
@@ -407,6 +412,21 @@ public class CarcassonneGUI extends Application {
         grid.setAlignment(Pos.CENTER);
         return grid;
     }
+    
+    public void torn(int jugadorActual){
+        int jugActual = (_torn+1)%_jugadors.size();
+        EventHandler<MouseEvent> handler = MouseEvent::consume;
+        if(_jugadors.get(jugActual).get_cpu()){
+            taul.addEventFilter(MouseEvent.ANY, handler);
+            rota.addEventFilter(MouseEvent.ANY, handler);
+        }
+        else{
+            taul.removeEventFilter(MouseEvent.ANY, handler);
+            rota.removeEventFilter(MouseEvent.ANY, handler);
+        }
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
