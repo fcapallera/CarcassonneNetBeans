@@ -66,8 +66,8 @@ public class Peça implements Comparable<Peça>{
     }
 
     public void rotarClockWise(){
-        String nouCodi = ""+_codi.charAt(0)+_codi.charAt(4)+_codi.charAt(1)+_codi.charAt(2)+_codi.charAt(3);
-        _codi = nouCodi;
+        //String nouCodi = ""+_codi.charAt(0)+_codi.charAt(4)+_codi.charAt(1)+_codi.charAt(2)+_codi.charAt(3);
+        //_codi = nouCodi;
         Regio sud = _regions.get(3);
         for(int i=1;i<4;i++){
             _regions.set(i,_regions.get(i-1));
@@ -75,6 +75,7 @@ public class Peça implements Comparable<Peça>{
         _regions.set(0,sud);
         _nRotacions++;
     }
+    
 
     public boolean esCompatible(Peça peça, int orientacio){
         return _codi.charAt(orientacio) == peça.get_codi().charAt((orientacio+2)%4);
