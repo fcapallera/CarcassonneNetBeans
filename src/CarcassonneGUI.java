@@ -59,9 +59,11 @@ public class CarcassonneGUI extends Application {
     private Button rota;
     private ImageView pila;
     private int rotacioPila; 
+    private Joc _joc;
     
     @Override
     public void start(Stage primaryStage) {
+        _joc = new Joc("1");
         row = 3;
         col = 3;
         numAux = 690;
@@ -83,6 +85,7 @@ public class CarcassonneGUI extends Application {
         BorderPane.setMargin(taul, new Insets(30, 10, 10, 50));
         BorderPane.setMargin(dreta, new Insets(10, 50, 10, 10));
         root.setRight(dreta);
+        taul.setAlignment(Pos.CENTER);
         root.setCenter(taul);
         root.setLeft(getLeftGridPane());
         rotacioPila = 0;
@@ -98,19 +101,7 @@ public class CarcassonneGUI extends Application {
         
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
-        primaryStage.show();
-        
-        rota.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                pila.setRotate(pila.getRotate() + 90);
-                if(rotacioPila != 3){
-                    rotacioPila ++;
-                }
-                else{
-                    rotacioPila = 0;
-                }                
-            }
-        });       
+        primaryStage.show();       
     }
     
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -173,69 +164,44 @@ public class CarcassonneGUI extends Application {
     }
     
     public GridPane getRightGridPane(){
-        //Carreguem la peça de dalt de tot de l'stack
+        //CREEM UN NOU GRID PANE DE 1x2
         GridPane grid = new GridPane();
         grid.setHgap(0);
         grid.setVgap(10);
         grid.setPadding(new Insets(0, 0, 0, 0));
-        String a = "tiles/";
-        String b = ".png";
-        pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream(a + _peces.peek().get_codi() + b)));
-        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png")));
+        
+        //CARREGUEM IMATGES DE LA PEÇA SUPERIOR DE LA PILA I DEL BOTÓ "ROTA"
+        pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png")));
         rota = new Button();
-        rota.setGraphic(aux);
+        rota.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png"))));
+        
+        //AFEGIM LA IMATGE DE LA PILA I EL BOTÓ AL GRID PANE
         grid.add(pila, 0, 0);
         grid.add(rota,0,1);
         grid.setAlignment(Pos.CENTER);
         pila.setFitHeight(numAux/5);
         pila.setFitWidth(numAux/5);
+        
         return grid;
     }
     
     public GridPane getCenterGridPane(){
-        GridPane grid = new GridPane();
-        grid.setHgap(0);
-        grid.setVgap(0);
-        grid.setPadding(new Insets(0, 0, 0, 0));
+        //CREEM EL GRID PANE
+        GridPane grid = gridPaneBuit(row,col);
         
-        /*for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                Text category = new Text("("+String.valueOf(i)+","+String.valueOf(j)+")");
-                category.setFont(Font.font("Arial", FontWeight.BOLD, 90));
-                grid.add(category, i, j);
-            }
-        }*/
-        
-        String a = "tiles/";
-        String b = ".png";
-        Iterator it = _tauler.getTauler().entrySet().iterator();
+        //ITEREM EL MAP DE PECES AL TAULER PER OBTENIR LA SEVA IMATGE
+        Iterator it = _joc.getTaulaJoc().getTauler().entrySet().iterator();
         Map.Entry pair = (Map.Entry)it.next();
         Peça aux =(Peça) pair.getValue();
-
+        ImageView imageChart = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + aux.get_codi() + ".png")));
+        
+        //AJUSTEM LA IMATGE I LA INSERIM AL SEU LLOC CORRESPONENT
+        ajustarImageView(imageChart);
+        int aux_x = getXTauler(aux.get_x());
+        int aux_y = getYTauler(aux.get_y());
+        grid.add(imageChart,aux_x,aux_y);
         
         
-        
-        for(int i = 0; i < col; i++){
-            for(int j = 0; j < row; j++){
-                ImageView imageChart;
-                if(i!=0 && i!=col-1 && j!=0 && j!=row-1){
-                    imageChart = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream(a + aux.get_codi() + b)));
-                }
-                else{
-                    imageChart = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png")));
-                }
-                if(row >= col){
-                        imageChart.setFitHeight(numAux/row);
-                        imageChart.setFitWidth(numAux/row);
-                    }
-                    else{
-                        imageChart.setFitHeight(numAux/col);
-                        imageChart.setFitWidth(numAux/col);
-                }
-                grid.add(imageChart, i, j);
-            }
-        }
-        grid.setAlignment(Pos.CENTER);
         return grid;
     }
     
@@ -243,13 +209,13 @@ public class CarcassonneGUI extends Application {
     private boolean esLimit(int x, int y){
         boolean res = false;
         if(x == 0 || y == 0 || x == col-1 || y == row-1){
-            
             res = true;
         }
         return res;
     }
     
     private GridPane gridPaneBuit(int x, int y){
+        //CREEM UN GRID PANE DE (x,y) I L'OMPLIM, A TOTES LES POSICIONS, AMB LA IMATGE QUE SIMBOLITZA "CASELLA BUIDA"
         GridPane res = new GridPane();
         for(int i = 0; i < col; i++){
             for(int j = 0; j < row; j++){
@@ -270,6 +236,7 @@ public class CarcassonneGUI extends Application {
     }
     
     private void resizeTauler(int x, int y){
+        //MIREM QUINA VARIABLE HEM D'INCREMENTAR
         if(x == 0 && y == 0 || x == 0 && y == row-1 || y == 0 && x == col-1 || x == col-1 && y == row-1){
             row++;
             col++;
@@ -280,126 +247,99 @@ public class CarcassonneGUI extends Application {
         else if(y == 0 || y == row-1){
             row ++;
         }
+        
+        //CREEM UN GRIDPANE BUIT I L'ASSIGNEM COM A GRID PANE ACTUAL PER VISUALITZAR EL TAULER
         GridPane nouGrid = gridPaneBuit(x,y);
         nouGrid.setAlignment(Pos.CENTER);
         taul = nouGrid;
-        Iterator it = _tauler.getTauler().entrySet().iterator();
-        String a = "tiles/";
-        String b = ".png";
+        
+        //ITEREM EL MAP DE PECES COL·LOCADES AL TAULER.
+        //OBTENIM LA X I LA Y HASH I LES TRANSFORMEM A LES X I Y DEL TAULER
+        //AFEGIM LA IMATGE A LA SEVA POSICIO CORRESPONENT DEL GRID PANE
+        Iterator it = _joc.getTaulaJoc().getTauler().entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Peça aux =(Peça) pair.getValue();
-            ImageView aux2 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream(a + aux.get_codi() + b)));
-            int aux_x = aux.get_x() - _tauler.getMinX() + 1;
-            int aux_y = (aux.get_y()*(-1)) + _tauler.getMaxY() + 1;
-            if(row >= col){
-                aux2.setFitHeight(numAux/row);
-                aux2.setFitWidth(numAux/row);
-            }
-            else{
-                aux2.setFitHeight(numAux/col);
-                aux2.setFitWidth(numAux/col);
-            }
+            ImageView aux2 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + aux.get_codi() + ".png")));
+            aux2.setRotate(aux.getIndexRotacio()*90);
+            int aux_x = getXTauler(aux.get_x());
+            int aux_y = getYTauler(aux.get_y());
+            ajustarImageView(aux2);
             nouGrid.add(aux2,aux_x,aux_y);
         }
+        //ACTUALITZEM EL CENTRE DEL BORDER PANE AMB EL NOSTRE TAULER NOU I CRIDEM ELS EVENT LISTENERS PERQUÈ SE LI APLIQUIN
         root.setCenter(taul);
         assignarEventListeners();
     }
     
     private boolean adjacenciesValides(int x, int y){ //X i Y del gridPane
-        boolean res = false;
-        boolean incompatible = false;
-        System.out.println(x+" "+y);
-        Peça p = _tauler.getPeça(getXHash(x),getYHash(y));
-        System.out.println(getXHash(x)+" "+getYHash(y));
-        //COMPROVAR PRIMER SI L'ELEMENT ÉS EN EL HASH MAP
-        if(!incompatible && x != 0){//0123 NESW
-            //COMPROVAR ESQUERRA
-            Peça aux = p.getPeçaAdjacent(3);
-            if(aux != null){
-                if(p.esCompatible(p.getPeçaAdjacent(3), 3)){
-                    res = true;
+        boolean compatible = false;
+	boolean valid = true;
+	if(x != col-1){		
+            if(_joc.getTaulaJoc().getTauler().containsKey((x+1)*100+y)){
+                valid = false;
+                if(_joc.peekPila().getRegioAdjacent(1)/*EST*/ == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(3)/*OEST*/){
+                    valid = true;
                 }
-                else{
-                    incompatible = true;
-                    res = false;
-                }
+
             }
-            else{
-                System.out.println("A");
-            }
-        }
-        if(!incompatible && y != 0){
-            //COMPROVAR DALT
-            Peça aux = p.getPeçaAdjacent(0);
-            if(aux != null){
-                if(p.esCompatible(p.getPeçaAdjacent(0), 0)){
-                    res = true;
-                }
-                else{
-                    incompatible = true;
-                    res = false;
+	}
+	if(x != 0){
+            if(_joc.getTaulaJoc().getTauler().containsKey((x-1)*100+y)){
+                valid = false;
+                if(_joc.peekPila().getRegioAdjacent(3) == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(1)){
+                    valid = true;
                 }
             }
-            else{
-                System.out.println("AA");
-            }
-        }
-        if(!incompatible && x != col-1){
-            //COMPROVAR DRETA
-            Peça aux = p.getPeçaAdjacent(1);
-            if(aux != null){
-                if(p.esCompatible(p.getPeçaAdjacent(1), 1)){
-                    res = true;
-                }
-                else{
-                    incompatible = true;
-                    res = false;
+	}
+	if(y != row-1){
+            if(_joc.getTaulaJoc().getTauler().containsKey(x*100+y+1)){
+                valid = false;
+                if(_joc.peekPila().getRegioAdjacent(2)/*SUD*/ == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(0)/*NORD*/){
+                    valid = true;
                 }
             }
-            else{
-                System.out.println("AAA");
-            }
-        }
-        if(!incompatible && y != row-1){
-            //COMPROVAR BAIX
-            Peça aux = p.getPeçaAdjacent(2);
-            if(aux != null){
-                if(p.esCompatible(p.getPeçaAdjacent(2), 2)){
-                    res = true;
-                }
-                else{
-                    incompatible = true;
-                    res = false;
+	}
+	if(y != 0){
+            if(_joc.getTaulaJoc().getTauler().containsKey(x*100+y-1)){
+                valid = false;
+                if(_joc.peekPila().getRegioAdjacent(0) == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(2)){
+                    valid = true;
                 }
             }
-            else{
-                System.out.println("AAAA");
-            }
-        }
+	}
+	compatible = valid;
+        return compatible;
+    }
+    
+    private int getXTauler(int xHash){
+        int res = xHash - _joc.getTaulaJoc().getMinX() + 1;
+        return res;
+    }
+    
+    private int getYTauler(int yHash){
+        int res = (yHash*(-1)) + _joc.getTaulaJoc().getMaxY() + 1;
         return res;
     }
     
     private int getXHash(int x){
-        int res = x + _tauler.getMinX() - 1;
+        int res = x + _joc.getTaulaJoc().getMinX() - 1;
         return res;                      
     }
     
     private int getYHash(int y){
-        int res = (y - _tauler.getMaxY() - 1)/(-1);
+        int res = (y - _joc.getTaulaJoc().getMaxY() - 1)/(-1);
         return res;
     }
     
     private void assignarEventListeners(){
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
-            //the drag and drop gesture has ended
-            //if the data was successfully moved, clear it
             if(event.getTransferMode() == TransferMode.MOVE){
                 String a = "tiles/";
                 String b = ".png";
-                if(!_peces.isEmpty()){
-                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream(a + _peces.peek().get_codi() + b));
+                if(!_joc.getPila().isEmpty()){
+                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
                     pila.setImage(aux);
                     pila.setRotate(0);
                     rotacioPila = 0;
@@ -407,7 +347,6 @@ public class CarcassonneGUI extends Application {
                 else{
                     pila.setVisible(false);
                 }
-                rotacioPila = 0;
             }
             event.consume();
         }
@@ -415,13 +354,8 @@ public class CarcassonneGUI extends Application {
         
         rota.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                pila.setRotate(pila.getRotate() + 90);
-                if(rotacioPila != 3){
-                    rotacioPila ++;
-                }
-                else{
-                    rotacioPila = 0;
-                }                
+                _joc.peekPila().rotarClockWise();
+                pila.setRotate(_joc.peekPila().getIndexRotacio()*90);              
             }
         });
         
@@ -429,17 +363,12 @@ public class CarcassonneGUI extends Application {
         //Drag detected event handler is used for adding drag functionality to the boat node
         pila.setOnDragDetected(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event){
-                //Drag was detected, start drap-and-drop gesture
-                //Allow any transfer node
                 Dragboard db = pila.startDragAndDrop(TransferMode.ANY);
-                //Put ImageView on dragboard
                 ClipboardContent cbContent = new ClipboardContent();
-                Image snap = pila.snapshot(new SnapshotParameters(), null);
                 Image image = pila.getImage();
                 cbContent.putImage(image);
                 db.setContent(cbContent);
                 event.consume();
-                //pila.setVisible(false);
             }
 
             private Rotate newRotate() {
@@ -450,11 +379,7 @@ public class CarcassonneGUI extends Application {
         //Drag over event handler is used for the receiving node to allow movement
         taul.setOnDragOver(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                //data is dragged over to target
-                //accept it only if it is not dragged from the same node
-                //and if it has image data
                 if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
-                    //allow for moving
                     event.acceptTransferModes(TransferMode.MOVE);
                     Node node = event.getPickResult().getIntersectedNode();
                     if(node != taul){
@@ -464,26 +389,18 @@ public class CarcassonneGUI extends Application {
                             int y = rIndex == null ? 0 : rIndex;
                             int xHash = getXHash(x);
                             int yHash = getYHash(y);
-                            if(!_tauler.getTauler().containsKey(xHash * 100 + yHash)){ //CASELLA NO TE FOTO
+                            if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){ //CASELLA NO TE FOTO
                                 String a = "tiles/";
                                 String b = ".png";
-                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream(a + _peces.peek().get_codi() + b));
+                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
                                 Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
                                 ImageView iv = new ImageView(aux1);
-                                iv.setRotate(rotacioPila*90);
-                                if(row >= col){
-                                    iv.setFitHeight(numAux/row);
-                                    iv.setFitWidth(numAux/row);
-                                }
-                                else{
-                                    iv.setFitHeight(numAux/col);
-                                    iv.setFitWidth(numAux/col);
-                                }
+                                iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
+                                ajustarImageView(iv);
                                 taul.add(iv, x, y);
 
                                 node.setOnDragExited(new EventHandler<DragEvent>() {
                                     public void handle(DragEvent event) {
-                                        //mouse moved away, remove graphical cues
                                         iv.setImage(aux2);
                                         event.consume();
                                     }
@@ -498,12 +415,6 @@ public class CarcassonneGUI extends Application {
         //Drag entered changes the appearance of the receiving node to indicate to the player that they can place there
         taul.setOnDragEntered(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                //The drag-and-drop gesture entered the target
-                //show the user that it is an actual gesture target
-                if(event.getGestureSource() != taul && event.getDragboard().hasImage()){
-                    //taul.setOpacity(0.7);
-                    
-                }
                 event.consume();
             }
         });
@@ -511,9 +422,6 @@ public class CarcassonneGUI extends Application {
         //Drag exited reverts the appearance of the receiving node when the mouse is outside of the node
         taul.setOnDragExited(new EventHandler<DragEvent>() {
             public void handle(DragEvent event) {
-                //mouse moved away, remove graphical cues
-                //taul.setOpacity(1);
-
                 event.consume();
             }
         });
@@ -533,25 +441,29 @@ public class CarcassonneGUI extends Application {
                         int y = rIndex == null ? 0 : rIndex;
                         int xHash = getXHash(x);
                         int yHash = getYHash(y);
-                        if(!_tauler.getTauler().containsKey(xHash * 100 + yHash)){
+                        if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){
                             //if(adjacenciesValides(x,y)){
-                                ImageView image = new ImageView(db.getImage());
-                                image.setRotate(image.getRotate() + (90*(rotacioPila)));
-                                if(row >= col){
-                                    image.setFitHeight(numAux/row);
-                                    image.setFitWidth(numAux/row);
-                                }
-                                else{
-                                    image.setFitHeight(numAux/col);
-                                    image.setFitWidth(numAux/col);
-                                }
                                 int nouX = getXHash(x);
                                 int nouY = getYHash(y);
-                                // TODO: set image size; use correct column/row span
+                                String a = "tiles/";
+                                String b = ".png";
+                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
+                                //Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
+                                ImageView iv = new ImageView(aux1);
+                                iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
+                                ajustarImageView(iv);
+                                if(row >= col){
+                                    iv.setFitHeight(numAux/row);
+                                    iv.setFitWidth(numAux/row);
+                                }
+                                else{
+                                    iv.setFitHeight(numAux/col);
+                                    iv.setFitWidth(numAux/col);
+                                }
+                                taul.add(iv, x, y);
                                 success = true;
-                                Peça p = _peces.pop();
-                                taul.add(image, x, y);
-                                _tauler.afegirPeça(p, nouX, nouY);
+                                Peça p = _joc.popPila();
+                                _joc.getTaulaJoc().afegirPeça(p, nouX, nouY);
                                 if(esLimit(x,y)){
                                     resizeTauler(x,y);
                                 }
@@ -581,7 +493,16 @@ public class CarcassonneGUI extends Application {
         
     }
     
-
+    private void ajustarImageView(ImageView iv){
+        if(row >= col){
+            iv.setFitHeight(numAux/row);
+            iv.setFitWidth(numAux/row);
+        }
+        else{
+            iv.setFitHeight(numAux/col);
+            iv.setFitWidth(numAux/col);
+        }
+    }
     
     /**
      * @param args the command line arguments

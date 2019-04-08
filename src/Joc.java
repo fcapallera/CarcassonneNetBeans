@@ -25,8 +25,19 @@ public class Joc {
     private Stack<Peça> _peces;
     private ArrayList<Jugador> _jugadors;
     private Tauler _tauler;
-    private int _torn = 0;
-    private boolean _jugat = false;
+    private int _torn;
+    private boolean _jugat;
+    
+    public Joc(String arxiu){
+        _peces = new Stack<Peça>();
+        _jugadors = new ArrayList<Jugador>();
+        _tauler = new Tauler(false);
+        _torn = 0;
+        _jugat = false;
+        this.init(arxiu);
+        
+        
+    }
 
     public void init(String arxiu){
         File f = new File(PROVES_SRC+arxiu+".txt");
@@ -81,5 +92,21 @@ public class Joc {
             }
             Collections.shuffle(_peces);
         } else System.out.println("Error");
+    }
+    
+    public Peça peekPila(){
+        return _peces.peek();
+    }
+    
+    public Peça popPila(){
+        return _peces.pop();
+    }
+    
+    public Stack<Peça> getPila(){
+        return _peces;
+    }
+    
+    public Tauler getTaulaJoc(){
+        return _tauler;
     }
 }
