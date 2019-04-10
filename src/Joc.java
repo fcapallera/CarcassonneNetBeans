@@ -42,6 +42,7 @@ public class Joc {
     public void init(String arxiu){
         File f = new File(PROVES_SRC+arxiu+".txt");
         HashMap<String,Integer> peces = new HashMap<>();
+        int n = 0;
         boolean error = false;
         try {
             Scanner lector = new Scanner(f);
@@ -72,7 +73,9 @@ public class Joc {
             if(lector.hasNext() && lector.next().equals("rajola_inicial")){
                 String inicial = lector.next();
                 peces.put(inicial,peces.get(inicial)-1);
-                _tauler.afegirPeça(new Peça(inicial),0,0);
+                Peça p = new Peça(inicial);
+                n += p.afegirRegions(n);
+                _tauler.afegirPeça(p,0,0);
             } else error = true;
 
         } catch (FileNotFoundException e){
@@ -86,7 +89,7 @@ public class Joc {
                 Map.Entry pair = (Map.Entry)it.next();
                 for(int i=0;i<(Integer)pair.getValue();i++){
                     Peça p = new Peça((String)pair.getKey());
-
+                    n += p.afegirRegions(n);
                     _peces.push(p);
                 }
             }
