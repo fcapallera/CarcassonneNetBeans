@@ -75,7 +75,7 @@ public class Peça implements Comparable<Peça>{
     
 
     public boolean esCompatible(Peça peça, int orientacio){
-        return _codi.charAt(orientacio) == peça.get_codi().charAt((orientacio+2)%4);
+        return _regions.get(orientacio).get_codi() == peça.getRegio((orientacio+2)%4).get_codi();
     }
 
     public Peça getPeçaAdjacent(int a){

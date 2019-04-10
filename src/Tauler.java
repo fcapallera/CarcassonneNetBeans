@@ -32,27 +32,29 @@ public class Tauler {
         actualitzarCotes(x,y);
         peça.set_x(x);
         peça.set_y(y);
+        _disponibles.remove(peça.hashCode());
         _tauler.put(peça.hashCode(),peça);
         
-        List<Peça> adjacents = new ArrayList<>();
+        List<Peça> adjacents = new ArrayList<>(4);
         int[] hashKeyAdj = {1,100,-1,-100};
 
         for(int i=0;i<4;i++){
             if(_tauler.containsKey(peça.hashCode()+hashKeyAdj[i])){
                 Peça adj = _tauler.get(peça.hashCode()+hashKeyAdj[i]);
-                adjacents.add(adj);
+                adjacents.set(i, adj);
                 adj.setPeçaAdjacent(peça,(i+2)%4);
                 //Comprovar monestirs adjacents
                 if(adj.centre()=='M'){
                     for(Construccio m : _connexions.get("M")) m.removePendent(peça.hashCode());
                 }
-            } else adjacents.add(null);
+            } else adjacents.set(i, null);
         }
         peça.set_adjacents(adjacents);
         
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             if(adjacents.get(i)==null){
+                _disponibles.add(adjacents.get(i).hashCode());
                 if(r.get_pertany()==null){
                     Construccio c;
                     if(r.get_codi()=='V'){
@@ -161,6 +163,20 @@ public class Tauler {
         else if(x > _maxX) _maxX = x;
         if(y < _minY) _minY = y;
         else if(y > _maxY) _maxY = y;
+    }
+    
+    public boolean jugadaValida(Peça peça, int x, int y){
+        if(!_disponibles.contains(peça.hashCode())) return false;
+        else{
+            boolean retorn = true;
+            List<Peça> adj = peça.get_adjacents();
+            for(int i=0;i<4;i++){
+                if(adj.get(i)!=null){
+                    if(!peça.esCompatible(peça, _minX)) retorn = false;
+                }
+            }
+            return retorn;
+        }
     }
 
 }
