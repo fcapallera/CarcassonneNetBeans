@@ -23,6 +23,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
@@ -57,13 +58,15 @@ public class CarcassonneGUI extends Application {
     private GridPane taul;
     private GridPane dreta;
     private Button rota;
+    private Button passa;
     private ImageView pila;
     private int rotacioPila; 
     private Joc _joc;
+    private Text numPila;
     
     @Override
     public void start(Stage primaryStage) {
-        _joc = new Joc("1");
+        _joc = new Joc("2");
         row = 3;
         col = 3;
         numAux = 690;
@@ -90,17 +93,11 @@ public class CarcassonneGUI extends Application {
         root.setLeft(getLeftGridPane());
         rotacioPila = 0;
         assignarEventListeners();
-        
-        
-        
-       
-        
+
         Scene scene = new Scene(root, 1000, 600);
-        
-        
-        
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("CARCASSONNE");
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
         primaryStage.show();       
     }
     
@@ -132,7 +129,7 @@ public class CarcassonneGUI extends Application {
         category.setEffect(ds);
         category.setCache(true);
         category.setFill(Color.BLUE);
-        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+        category.setFont(Font.font(null, FontWeight.BOLD, 16));
         grid.add(category, 0, 0);
         category = new Text("PUNTUACIO");
         category.setEffect(ds);
@@ -174,10 +171,22 @@ public class CarcassonneGUI extends Application {
         pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png")));
         rota = new Button();
         rota.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png"))));
+        passa = new Button();
+        passa.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/next.png"))));
+        numPila = new Text();
+        numPila.setCache(true);
+        numPila.setFill(Color.WHITE);
+        numPila.setFont(Font.font(null, FontWeight.BOLD, 26));
+        numPila.setText(String.valueOf(_joc.getPila().size()));
+        passa.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        rota.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         
         //AFEGIM LA IMATGE DE LA PILA I EL BOTÓ AL GRID PANE
-        grid.add(pila, 0, 0);
-        grid.add(rota,0,1);
+        grid.add(numPila,0,0);
+        grid.add(pila, 0, 1);
+        grid.add(rota,0,2);
+        grid.add(passa,0,3);
         grid.setAlignment(Pos.CENTER);
         pila.setFitHeight(numAux/5);
         pila.setFitWidth(numAux/5);
@@ -336,16 +345,16 @@ public class CarcassonneGUI extends Application {
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
             if(event.getTransferMode() == TransferMode.MOVE){
-                String a = "tiles/";
-                String b = ".png";
                 if(!_joc.getPila().isEmpty()){
-                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
+                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
                     pila.setImage(aux);
                     pila.setRotate(0);
                     rotacioPila = 0;
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
                 else{
                     pila.setVisible(false);
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
             }
             event.consume();
@@ -358,6 +367,25 @@ public class CarcassonneGUI extends Application {
                 pila.setRotate(_joc.peekPila().getIndexRotacio()*90);              
             }
         });
+        
+        passa.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                _joc.popPila();
+                if(!_joc.getPila().isEmpty()){
+                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                    pila.setImage(aux);
+                    pila.setRotate(0);
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
+                }
+                else{
+                    pila.setVisible(false);
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
+                }
+                
+            }
+        });
+        
+        
         
         
         //Drag detected event handler is used for adding drag functionality to the boat node
@@ -390,9 +418,7 @@ public class CarcassonneGUI extends Application {
                             int xHash = getXHash(x);
                             int yHash = getYHash(y);
                             if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){ //CASELLA NO TE FOTO
-                                String a = "tiles/";
-                                String b = ".png";
-                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
+                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
                                 Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
                                 ImageView iv = new ImageView(aux1);
                                 iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
