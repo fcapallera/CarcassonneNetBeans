@@ -7,7 +7,8 @@ public class Construccio {
     protected Set<Integer> _pendents = new HashSet<>();
 
     public Construccio(Regio regio){
-        _regions.add(regio);
+        addRegio(regio);
+        regio.set_pertany(this);
     }
 
     public int puntuar(){return _regions.size();}
@@ -42,7 +43,10 @@ public class Construccio {
 
     public void addRegio(Regio regio){
         _regions.add(regio);
-
+        _pendents.remove(regio.get_peça());
+        regio.get_peça().get_adjacents().stream()
+                .filter(adj -> adj !=null)
+                .forEach(p -> _pendents.add(p.hashCode()));
     }
     
     public void addPendent(Integer pendent){

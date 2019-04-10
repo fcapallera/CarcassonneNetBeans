@@ -3,17 +3,22 @@ import java.util.Objects;
 
 public class Regio implements Comparable<Regio> {
     final private int _id;
+    final private char _codi;
     private String _seguidor = "";
     final private boolean _escut = false;
     private Peça _peça;
+    private Construccio _pertany = null;
 
-    public Regio(int _id, Peça peça) {
+    public Regio(int _id, Peça peça, char codi) {
         this._id = _id;
         this._peça = peça;
+        this._codi = codi;
     }
     
-    public Regio(int _id, boolean escut) {
+    public Regio(int _id, boolean escut, Peça peça, char codi) {
         this._id = _id;
+        this._peça = peça;
+        this._codi = codi;
     }
 
     @Override
@@ -63,5 +68,17 @@ public class Regio implements Comparable<Regio> {
     
     public Peça get_peça(){
         return _peça;
+    }
+    
+    public char get_codi(){
+        return _codi;
+    }
+    
+    public void set_pertany(Construccio c){
+        _pertany = c;
+    }
+    
+    public Construccio get_pertany(){
+        return _pertany;
     }
 }

@@ -54,9 +54,6 @@ public class Peça implements Comparable<Peça>{
         _indexs.put("V", new ArrayList<>());
         _indexs.put("C", new ArrayList<>());
         _indexs.put("F", new ArrayList<>());
-        for(int i=1;i<5;i++){
-            _indexs.get(""+_codi.charAt(i)).add(i-1);
-        }
     }
 
     public Peça(int _x, int _y, String _codi) {
@@ -99,7 +96,7 @@ public class Peça implements Comparable<Peça>{
         int n = 0;
         char c = centre();
         if(c == 'V' || c == 'E'){
-            Regio v = new Regio(nReg,c=='E');
+            Regio v = new Regio(nReg,c=='E',this,'V');
             n++;
             for(int i=1;i<5;i++){
                 if(_codi.charAt(i)=='V') _regions.set(i-1, v);
@@ -108,7 +105,7 @@ public class Peça implements Comparable<Peça>{
         else{
             for(int i=1;i<5;i++){
                 if(_codi.charAt(i)=='V'){
-                    Regio v = new Regio(nReg+(n++),this);
+                    Regio v = new Regio(nReg+(n++),this,'V');
                     _regions.set(i-1, v);
                 }
             }
@@ -116,16 +113,31 @@ public class Peça implements Comparable<Peça>{
         if(c == 'X'){
             for(int i=1;i<5;i++){
                 if(_codi.charAt(i)=='C'){
-                    Regio p = new Regio(nReg+(n++),this);
+                    Regio p = new Regio(nReg+(n++),this,'C');
                     _regions.set(i-1, p);
                 }
             }
         }
         else{
             if(_codi.indexOf('C')>0){
-                Regio p = new Regio(nReg+(n++),this);
+                Regio p = new Regio(nReg+(n++),this,'C');
                 for(int i=1;i<5;i++){
                     if(_codi.charAt(i)=='C') _regions.set(i-1, p);
+                }
+            }
+        }
+        if(c == 'F'){
+            Regio f = new Regio(nReg,this,'F');
+            n++;
+            for(int i=1;i<5;i++){
+                if(_codi.charAt(i)=='F') _regions.set(i-1, f);
+            }
+        }
+        else{
+            for(int i=1;i<5;i++){
+                if(_codi.charAt(i)=='F'){
+                    Regio f = new Regio(nReg+(n++),this,'F');
+                    _regions.set(i-1, f);
                 }
             }
         }
@@ -140,6 +152,7 @@ public class Peça implements Comparable<Peça>{
         if(a > 0 || a < 4) throw new IndexOutOfBoundsException("Index "+a+" is out of bounds");
         else return _codi.charAt(a);
     }
+    
 
     public boolean hiHaEscut(){
         return _codi.indexOf('E') > 0;
@@ -186,6 +199,12 @@ public class Peça implements Comparable<Peça>{
 
     public int get_x() {
         return _x;
+    }
+    
+    public void set_indexs(){
+        for(int i=1;i<5;i++){
+            _indexs.get(""+_regions.get(i).get_codi()).add(i-1);
+        }
     }
 
     public void set_x(int _x) {
