@@ -29,6 +29,7 @@ public class Tauler {
     }
     
     public void afegirPeça(Peça peça, int x, int y){
+        System.out.println("Peça afegida ("+x+","+y+")");
         actualitzarCotes(x,y);
         peça.set_x(x);
         peça.set_y(y);
@@ -50,32 +51,38 @@ public class Tauler {
             } else adjacents.add(null);
         }
         peça.set_adjacents(adjacents);
+        System.out.println("arriba");
         
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
+            System.out.println(i+": "+r.hashCode());
             if(adjacents.get(i)==null){
                 _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
                 if(r.get_pertany()==null){
                     Construccio c;
                     if(r.get_codi()=='V'){
+                        System.out.println("Nova ciutat");
                         c = new Vila(r);
                         _connexions.get(""+r.get_codi()).add(c);
                         r.set_pertany(c);
                     }
                     else if(r.get_codi()=='C'){
+                        System.out.println("Nou cami");
                         c = new Cami(r);
                         _connexions.get(""+r.get_codi()).add(c);
                         r.set_pertany(c);
                     }
-                }
+                } else System.out.println("putae");
             }
             else{
                 if(r.get_pertany()==null){
                     Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
                     c.addRegio(r);
                     r.set_pertany(c);
+                    System.out.println("Expansio");
                 }
                 else{
+                    System.out.println("Fusio");
                     Construccio a = r.get_pertany();
                     Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
                     a.fusionar(b);
