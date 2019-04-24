@@ -173,13 +173,13 @@ public class Tauler {
     }
     
     public boolean jugadaValida(Peça peça, int x, int y){
-        if(!_disponibles.contains(peça.hashCode())) return false;
+        if(!_disponibles.contains(100*x+y)) return false;
         else{
             boolean retorn = true;
-            List<Peça> adj = peça.get_adjacents();
+            int[] hashKeyAdj = {1,100,-1,-100};
             for(int i=0;i<4;i++){
-                if(adj.get(i)!=null){
-                    if(!peça.esCompatible(peça, _minX)) retorn = false;
+                if(_tauler.containsKey(100*x+y+hashKeyAdj[i])){
+                    if(!peça.esCompatible(_tauler.get(100*x+y+hashKeyAdj[i]), i)) retorn = false;
                 }
             }
             return retorn;
