@@ -55,10 +55,17 @@ public class CarcassonneGUI extends Application {
     private int col;
     private int row;   
     private BorderPane root;
+    private BorderPane colocarSeg;
     private GridPane taul;
     private GridPane dreta;
     private Button rota;
     private Button passa;
+    private Button afegirSeguidor;
+    private Button top;
+    private Button bot;
+    private Button left;
+    private Button right;
+    private Button center;
     private ImageView pila;
     private int rotacioPila; 
     private Joc _joc;
@@ -112,6 +119,7 @@ public class CarcassonneGUI extends Application {
     
     public GridPane getLeftGridPane(){
         GridPane grid = new GridPane();
+        GridPane grid2 = new GridPane();
         grid.setHgap(75);
         grid.setVgap(20);
         
@@ -160,6 +168,8 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
+    
+    
     public GridPane getRightGridPane(){
         //CREEM UN NOU GRID PANE DE 1x2
         GridPane grid = new GridPane();
@@ -173,6 +183,18 @@ public class CarcassonneGUI extends Application {
         rota.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png"))));
         passa = new Button();
         passa.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/next.png"))));
+        afegirSeguidor = new Button();
+        afegirSeguidor.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/afegirSeguidor.png"))));
+        top = new Button();
+        top.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/top.png"))));
+        bot = new Button();
+        bot.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/bot.png"))));
+        left = new Button();
+        left.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/left.png"))));
+        right = new Button();
+        right.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/right.png"))));
+        center = new Button();
+        center.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/center.png"))));
         numPila = new Text();
         numPila.setCache(true);
         numPila.setFill(Color.WHITE);
@@ -180,16 +202,40 @@ public class CarcassonneGUI extends Application {
         numPila.setText(String.valueOf(_joc.getPila().size()));
         passa.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         rota.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        
+        afegirSeguidor.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        top.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        bot.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        center.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        left.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        right.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+     
         
         //AFEGIM LA IMATGE DE LA PILA I EL BOTÓ AL GRID PANE
-        grid.add(numPila,0,0);
+        /*grid.add(numPila,0,0);
         grid.add(pila, 0, 1);
         grid.add(rota,0,2);
         grid.add(passa,0,3);
+        grid.add(afegirSeguidor,0,4);
+        grid.add(colocarSeg,0,5);*/
+        
+        grid.add(numPila,1,0);
+        grid.add(pila, 1, 1);
+        grid.add(rota,1,2);
+        grid.add(passa,1,3);
+        grid.add(afegirSeguidor,1,4);
+        grid.add(top,1,5);
+        grid.add(center,1,6);
+        grid.add(left,0,6);
+        grid.add(right,2,6);
+        grid.add(bot,1,7);
         grid.setAlignment(Pos.CENTER);
         pila.setFitHeight(numAux/5);
         pila.setFitWidth(numAux/5);
+        top.setVisible(false);
+        bot.setVisible(false);
+        center.setVisible(false);
+        left.setVisible(false);
+        right.setVisible(false);
         
         return grid;
     }
@@ -348,8 +394,7 @@ public class CarcassonneGUI extends Application {
                 if(!_joc.getPila().isEmpty()){
                     Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
                     pila.setImage(aux);
-                    pila.setRotate(0);
-                    rotacioPila = 0;
+                    pila.setRotate(_joc.peekPila().getIndexRotacio()*90);
                     numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
                 else{
@@ -359,6 +404,16 @@ public class CarcassonneGUI extends Application {
             }
             event.consume();
         }
+        });
+        
+        afegirSeguidor.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                top.setVisible(true);
+                bot.setVisible(true);
+                center.setVisible(true);
+                left.setVisible(true);
+                right.setVisible(true);             
+            }
         });
         
         rota.setOnAction(new EventHandler<ActionEvent>() {
@@ -468,39 +523,31 @@ public class CarcassonneGUI extends Application {
                         int xHash = getXHash(x);
                         int yHash = getYHash(y);
                         if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){
-                            //if(adjacenciesValides(x,y)){
-                                int nouX = getXHash(x);
-                                int nouY = getYHash(y);
-                                String a = "tiles/";
-                                String b = ".png";
-                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream(a + _joc.peekPila().get_codi() + b));
-                                //Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
+                            if(_joc.getTaulaJoc().jugadaValida(_joc.peekPila(), xHash, yHash)){
+                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
                                 ImageView iv = new ImageView(aux1);
                                 iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
                                 ajustarImageView(iv);
-                                if(row >= col){
-                                    iv.setFitHeight(numAux/row);
-                                    iv.setFitWidth(numAux/row);
-                                }
-                                else{
-                                    iv.setFitHeight(numAux/col);
-                                    iv.setFitWidth(numAux/col);
-                                }
                                 taul.add(iv, x, y);
                                 success = true;
                                 Peça p = _joc.popPila();
-                                _joc.getTaulaJoc().afegirPeça(p, nouX, nouY);
+                                _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
                                 if(esLimit(x,y)){
                                     resizeTauler(x,y);
                                 }
-                            //}    
+                            }
+                            else{
+                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
+                                ImageView iv = new ImageView(aux1);
+                                iv.setRotate(0);
+                                ajustarImageView(iv);
+                                taul.add(iv, x, y);
+                                success = true;
+                            }
                         }
                     }
-                
                 //let the source know whether the image was successfully transferred and used
                 event.setDropCompleted(success);
-                    
-
                 event.consume();
             }
         });
