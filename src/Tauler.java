@@ -56,37 +56,39 @@ public class Tauler {
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             System.out.println(i+": "+r.hashCode());
-            if(adjacents.get(i)==null){
-                _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
-                if(r.get_pertany()==null){
-                    Construccio c;
-                    if(r.get_codi()=='V'){
-                        System.out.println("Nova ciutat");
-                        c = new Vila(r);
-                        _connexions.get(""+r.get_codi()).add(c);
-                        r.set_pertany(c);
-                    }
-                    else if(r.get_codi()=='C'){
-                        System.out.println("Nou cami");
-                        c = new Cami(r);
-                        _connexions.get(""+r.get_codi()).add(c);
-                        r.set_pertany(c);
-                    }
-                } else System.out.println("putae");
-            }
-            else{
-                if(r.get_pertany()==null){
-                    Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
-                    c.addRegio(r);
-                    r.set_pertany(c);
-                    System.out.println("Expansio");
+            if(r.get_codi()!='F'){
+                if(adjacents.get(i)==null){
+                    _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
+                    if(r.get_pertany()==null){
+                        Construccio c;
+                        if(r.get_codi()=='V'){
+                            System.out.println("Nova ciutat");
+                            c = new Vila(r);
+                            _connexions.get(""+r.get_codi()).add(c);
+                            r.set_pertany(c);
+                        }
+                        else if(r.get_codi()=='C'){
+                            System.out.println("Nou cami");
+                            c = new Cami(r);
+                            _connexions.get(""+r.get_codi()).add(c);
+                            r.set_pertany(c);
+                        }
+                    } else System.out.println("putae");
                 }
                 else{
-                    System.out.println("Fusio");
-                    Construccio a = r.get_pertany();
-                    Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
-                    a.fusionar(b);
-                    _connexions.get(""+r.get_codi()).remove(b);
+                    if(r.get_pertany()==null){
+                        Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
+                        c.addRegio(r);
+                        r.set_pertany(c);
+                        System.out.println("Expansio");
+                    }
+                    else{
+                        System.out.println("Fusio");
+                        Construccio a = r.get_pertany();
+                        Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
+                        a.fusionar(b);
+                        _connexions.get(""+r.get_codi()).remove(b);
+                    }
                 }
             }
         }
@@ -173,13 +175,12 @@ public class Tauler {
     }
     
     public boolean jugadaValida(Peça peça, int x, int y){
-        if(!_disponibles.contains(peça.hashCode())) return false;
+        if(!_disponibles.contains(x*100+y)) return false;
         else{
             boolean retorn = true;
-            List<Peça> adj = peça.get_adjacents();
             for(int i=0;i<4;i++){
-                if(adj.get(i)!=null){
-                    if(!peça.esCompatible(peça, _minX)) retorn = false;
+                if(_tauler.containsKey(100*x+y)){
+                    if(!peça.esCompatible(_tauler.get(100*x+y), i)) retorn = false;
                 }
             }
             return retorn;
