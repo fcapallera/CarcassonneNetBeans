@@ -32,7 +32,7 @@ public class Joc {
         _peces = new Stack<Peça>();
         _jugadors = new ArrayList<Jugador>();
         _tauler = new Tauler(false);
-        _torn = 0;
+        _torn = -1;
         _jugat = false;
         this.init(arxiu);
         
@@ -111,5 +111,21 @@ public class Joc {
     
     public Tauler getTaulaJoc(){
         return _tauler;
+    }
+    
+    public int getTorn(){
+        return _torn % _jugadors.size();
+    }
+    
+    public void jugar(){
+        //Avança un torn i deixa jugar al seguent jugador
+        _torn ++;
+        if(_jugadors.get(_torn % _jugadors.size()).get_cpu()){
+            //Jugar la CPU
+        }
+        else{
+            //Jugar amb jugador humà, ergo, no fer res.
+        }
+        
     }
 }
