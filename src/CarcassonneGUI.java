@@ -38,6 +38,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -66,10 +67,15 @@ public class CarcassonneGUI extends Application {
     private Button left;
     private Button right;
     private Button center;
+    private Button acabar_torn;
     private ImageView pila;
     private int rotacioPila; 
     private Joc _joc;
     private Text numPila;
+    private int lastxHash;
+    private int lastyHash;
+    
+
     
     @Override
     public void start(Stage primaryStage) {
@@ -100,12 +106,12 @@ public class CarcassonneGUI extends Application {
         root.setLeft(getLeftGridPane());
         rotacioPila = 0;
         assignarEventListeners();
-
         Scene scene = new Scene(root, 1000, 600);
         primaryStage.setTitle("CARCASSONNE");
         primaryStage.setScene(scene);
         primaryStage.setMaximized(true);
-        primaryStage.show();       
+        primaryStage.show();
+        _joc.jugar();
     }
     
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -195,6 +201,8 @@ public class CarcassonneGUI extends Application {
         right.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/right.png"))));
         center = new Button();
         center.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/center.png"))));
+        acabar_torn = new Button();
+        acabar_torn.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/acabar_torn.png"))));
         numPila = new Text();
         numPila.setCache(true);
         numPila.setFill(Color.WHITE);
@@ -208,6 +216,7 @@ public class CarcassonneGUI extends Application {
         center.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         left.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         right.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        acabar_torn.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
      
         
         //AFEGIM LA IMATGE DE LA PILA I EL BOTÓ AL GRID PANE
@@ -217,12 +226,12 @@ public class CarcassonneGUI extends Application {
         grid.add(passa,0,3);
         grid.add(afegirSeguidor,0,4);
         grid.add(colocarSeg,0,5);*/
-        
         grid.add(numPila,1,0);
         grid.add(pila, 1, 1);
         grid.add(rota,1,2);
         grid.add(passa,1,3);
         grid.add(afegirSeguidor,1,4);
+        grid.add(acabar_torn,2,4);
         grid.add(top,1,5);
         grid.add(center,1,6);
         grid.add(left,0,6);
@@ -231,11 +240,10 @@ public class CarcassonneGUI extends Application {
         grid.setAlignment(Pos.CENTER);
         pila.setFitHeight(numAux/5);
         pila.setFitWidth(numAux/5);
-        top.setVisible(false);
-        bot.setVisible(false);
-        center.setVisible(false);
-        left.setVisible(false);
-        right.setVisible(false);
+        amagarBotons(1);
+        
+        
+        
         
         return grid;
     }
@@ -320,7 +328,9 @@ public class CarcassonneGUI extends Application {
             int aux_x = getXTauler(aux.get_x());
             int aux_y = getYTauler(aux.get_y());
             ajustarImageView(aux2);
-            nouGrid.add(aux2,aux_x,aux_y);
+            StackPane casella = new StackPane();
+            casella.getChildren().add(aux2);
+            nouGrid.add(casella,aux_x,aux_y);
         }
         //ACTUALITZEM EL CENTRE DEL BORDER PANE AMB EL NOSTRE TAULER NOU I CRIDEM ELS EVENT LISTENERS PERQUÈ SE LI APLIQUIN
         root.setCenter(taul);
@@ -390,7 +400,7 @@ public class CarcassonneGUI extends Application {
     private void assignarEventListeners(){
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
-            if(event.getTransferMode() == TransferMode.MOVE){
+            /*if(event.getTransferMode() == TransferMode.MOVE){
                 if(!_joc.getPila().isEmpty()){
                     Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
                     pila.setImage(aux);
@@ -401,18 +411,33 @@ public class CarcassonneGUI extends Application {
                     pila.setVisible(false);
                     numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
-            }
+            }*/
             event.consume();
         }
         });
         
         afegirSeguidor.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                top.setVisible(true);
-                bot.setVisible(true);
-                center.setVisible(true);
-                left.setVisible(true);
-                right.setVisible(true);             
+                mostrarBotons(3);
+            }
+        });
+        
+        acabar_torn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                amagarBotons(1);
+                if(!_joc.getPila().isEmpty()){
+                    pila.setVisible(true);
+                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                    pila.setImage(aux);
+                    pila.setRotate(_joc.peekPila().getIndexRotacio()*90);
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
+                }
+                else{
+                    pila.setVisible(false);
+                    numPila.setText(String.valueOf(_joc.getPila().size()));
+                }
+                mostrarBotons(1);
+                _joc.jugar();
             }
         });
         
@@ -440,7 +465,31 @@ public class CarcassonneGUI extends Application {
             }
         });
         
-        
+        top.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                afegirSeguidor(Pos.TOP_CENTER);
+            }
+        });
+        bot.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                afegirSeguidor(Pos.BOTTOM_CENTER);            
+            }
+        });
+        center.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                afegirSeguidor(Pos.CENTER);            
+            }
+        });
+        left.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                afegirSeguidor(Pos.CENTER_LEFT);           
+            }
+        });
+        right.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                afegirSeguidor(Pos.CENTER_RIGHT);
+            }
+        });
         
         
         //Drag detected event handler is used for adding drag functionality to the boat node
@@ -468,24 +517,26 @@ public class CarcassonneGUI extends Application {
                     if(node != taul){
                             Integer cIndex = GridPane.getColumnIndex(node);
                             Integer rIndex = GridPane.getRowIndex(node);
-                            int x = cIndex == null ? 0 : cIndex;
-                            int y = rIndex == null ? 0 : rIndex;
-                            int xHash = getXHash(x);
-                            int yHash = getYHash(y);
-                            if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){ //CASELLA NO TE FOTO
-                                Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
-                                Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
-                                ImageView iv = new ImageView(aux1);
-                                iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
-                                ajustarImageView(iv);
-                                taul.add(iv, x, y);
+                            int x = cIndex == null ? -1 : cIndex; //SI L'INDEX ES NULL, ES POSA A 0
+                            int y = rIndex == null ? -1 : rIndex; //SI L'INDEX ES NULL, ES POSA A 0
+                            if(x != -1){
+                                int xHash = getXHash(x);
+                                int yHash = getYHash(y);
+                                if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){ //CASELLA NO TE FOTO
+                                    Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                                    Image aux2 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
+                                    ImageView iv = new ImageView(aux1);
+                                    iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
+                                    ajustarImageView(iv);
+                                    taul.add(iv, x, y);
 
-                                node.setOnDragExited(new EventHandler<DragEvent>() {
-                                    public void handle(DragEvent event) {
-                                        iv.setImage(aux2);
-                                        event.consume();
-                                    }
-                                });
+                                    node.setOnDragExited(new EventHandler<DragEvent>() {
+                                        public void handle(DragEvent event) {
+                                            iv.setImage(aux2);
+                                            event.consume();
+                                        }
+                                    });
+                                }
                             }
                     }
                 }                  
@@ -518,8 +569,8 @@ public class CarcassonneGUI extends Application {
                     if(node != taul && db.hasImage()){
                         Integer cIndex = GridPane.getColumnIndex(node);
                         Integer rIndex = GridPane.getRowIndex(node);
-                        int x = cIndex == null ? 0 : cIndex;
-                        int y = rIndex == null ? 0 : rIndex;
+                        int x = cIndex == null ? -1 : cIndex;
+                        int y = rIndex == null ? -1 : rIndex;
                         int xHash = getXHash(x);
                         int yHash = getYHash(y);
                         if(!_joc.getTaulaJoc().getTauler().containsKey(xHash * 100 + yHash)){
@@ -528,13 +579,21 @@ public class CarcassonneGUI extends Application {
                                 ImageView iv = new ImageView(aux1);
                                 iv.setRotate(_joc.peekPila().getIndexRotacio()*90);
                                 ajustarImageView(iv);
-                                taul.add(iv, x, y);
+                                StackPane casella = new StackPane();
+                                casella.getChildren().add(iv);
+                                taul.add(casella, x, y);
+                                lastxHash = xHash;
+                                lastyHash = yHash;
                                 success = true;
                                 Peça p = _joc.popPila();
                                 _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
                                 if(esLimit(x,y)){
                                     resizeTauler(x,y);
                                 }
+                                
+                                amagarBotons(2);
+                                mostrarBotons(2);
+                                
                             }
                             else{
                                 Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
@@ -542,7 +601,7 @@ public class CarcassonneGUI extends Application {
                                 iv.setRotate(0);
                                 ajustarImageView(iv);
                                 taul.add(iv, x, y);
-                                success = true;
+                                success = false;
                             }
                         }
                     }
@@ -556,8 +615,8 @@ public class CarcassonneGUI extends Application {
             public void handle(DragEvent event) {
                 //Data dropped
                 //If there is an image on the dragboard, read it and use it
-                boolean success = false;
-                pila.setVisible(true);
+                boolean success = true;
+                passa.setVisible(false);
                 //let the source know whether the image was successfully transferred and used
                 event.setDropCompleted(success);
                 event.consume();
@@ -574,6 +633,69 @@ public class CarcassonneGUI extends Application {
         else{
             iv.setFitHeight(numAux/col);
             iv.setFitWidth(numAux/col);
+        }
+    }
+    
+    private void ajustarSeguidor(ImageView iv){
+        if(row >= col){
+            iv.setFitHeight((numAux/row)/3.5);
+            iv.setFitWidth((numAux/row)/3.5);
+        }
+        else{
+            iv.setFitHeight((numAux/col)/3.5);
+            iv.setFitWidth((numAux/col)/3.5);
+        }
+    }
+    
+    private void afegirSeguidor(Pos value){
+        ImageView aux1 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
+        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
+        ajustarImageView(aux1);
+        ajustarSeguidor(aux);
+        aux1.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);
+        StackPane sp = new StackPane();
+        sp.getChildren().add(aux1);
+        sp.getChildren().add(aux);
+        StackPane.setAlignment(aux,value);
+        int x = getXTauler(lastxHash);
+        int y = getYTauler(lastyHash);
+        taul.add(sp,x,y);
+    }
+    
+    private void amagarBotons(int n){
+        if(n == 1){
+            top.setVisible(false);
+            bot.setVisible(false);
+            center.setVisible(false);
+            left.setVisible(false);
+            right.setVisible(false);
+            acabar_torn.setVisible(false);
+            afegirSeguidor.setVisible(false);
+        }
+        else if(n == 2){
+            pila.setVisible(false);
+            passa.setVisible(false);
+            rota.setVisible(false);
+            numPila.setVisible(false); 
+        }
+    }
+    
+    private void mostrarBotons(int n){
+        if(n == 1){
+            passa.setVisible(true);
+            rota.setVisible(true);
+            numPila.setVisible(true);
+        }
+        else if(n == 2){
+            afegirSeguidor.setVisible(true);
+            acabar_torn.setVisible(true);
+        }
+        else if(n == 3){
+            top.setVisible(true);
+            bot.setVisible(true);
+            center.setVisible(true);
+            left.setVisible(true);
+            right.setVisible(true);
         }
     }
     
