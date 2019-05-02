@@ -19,12 +19,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -38,6 +44,8 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -56,9 +64,11 @@ public class CarcassonneGUI extends Application {
     private int col;
     private int row;   
     private BorderPane root;
+    private GridPane root0;
     private BorderPane colocarSeg;
     private GridPane taul;
     private GridPane dreta;
+    private GridPane esquerra;
     private Button rota;
     private Button passa;
     private Button afegirSeguidor;
@@ -68,12 +78,16 @@ public class CarcassonneGUI extends Application {
     private Button right;
     private Button center;
     private Button acabar_torn;
+    private Button jugar;
+    private TextField nJugadors;
     private ImageView pila;
     private int rotacioPila; 
+    private int numJug;
     private Joc _joc;
     private Text numPila;
     private int lastxHash;
     private int lastyHash;
+    private Scene escena;
     
 
     
@@ -94,24 +108,78 @@ public class CarcassonneGUI extends Application {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 bSize)));
-        taul = getCenterGridPane();
-        dreta = getRightGridPane();
-        root.setAlignment(taul,Pos.CENTER);
-        BorderPane.setAlignment(dreta,Pos.CENTER);
-        BorderPane.setMargin(taul, new Insets(30, 10, 10, 50));
-        BorderPane.setMargin(dreta, new Insets(10, 50, 10, 10));
-        root.setRight(dreta);
-        taul.setAlignment(Pos.CENTER);
-        root.setCenter(taul);
-        root.setLeft(getLeftGridPane());
+        
         rotacioPila = 0;
-        assignarEventListeners();
+        
         Scene scene = new Scene(root, 1000, 600);
+        Scene scene1 = triarNJugadors();
+        Image image = new Image("images/cursor.png");  //pass in the image path
+        scene.setCursor(new ImageCursor(image));
+        escena = scene;
         primaryStage.setTitle("CARCASSONNE");
-        primaryStage.setScene(scene);
-        primaryStage.setMaximized(true);
+        primaryStage.setScene(scene1);
+        primaryStage.setMaximized(false);
         primaryStage.show();
+        
+        jugar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                numJug = Integer.parseInt(nJugadors.getText());
+
+                taul = getCenterGridPane();
+                dreta = getRightGridPane();
+                esquerra = getLeftGridPane();
+                root.setAlignment(taul,Pos.CENTER);
+                BorderPane.setAlignment(dreta,Pos.CENTER);
+                BorderPane.setAlignment(esquerra,Pos.TOP_CENTER);
+                BorderPane.setMargin(taul, new Insets(30, 10, 10, 50));
+                BorderPane.setMargin(dreta, new Insets(10, 50, 10, 10));
+                BorderPane.setMargin(esquerra, new Insets(10, 50, 10, 10));
+                root.setRight(dreta);
+                taul.setAlignment(Pos.CENTER);
+                root.setCenter(taul);
+                root.setLeft(esquerra);
+                assignarEventListeners();
+                actualitzarPuntuacio(1,10);
+                actualitzarPuntuacio(2,20);
+                primaryStage.setScene(escena);
+                primaryStage.setMaximized(true);
+            }
+        });
+        
+        
+        
         _joc.jugar();
+    }
+    
+    private Scene triarNJugadors(){
+        //EFECTES DE TEXT        
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        ///
+        
+        root0 = new GridPane();
+        Scene scene = new Scene(root0, 800, 449);
+        Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper1.jpg"));
+        BackgroundSize bSize = new BackgroundSize(root0.getWidth(), root0.getHeight(), false, false, true, false);
+        root0.setBackground(new Background(new BackgroundImage(image2,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                bSize)));
+        Text category = new Text("N Jugadors (2-5)");
+        category.setEffect(ds);
+        category.setCache(true);
+        category.setFill(Color.SILVER);
+        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+        nJugadors = new TextField ();
+        HBox hb = new HBox();
+        jugar = new Button("Jugar");
+        root0.add(category, 0,0);
+        root0.add(nJugadors,1,0);
+        root0.add(jugar,1,1);
+        root0.setAlignment(Pos.BOTTOM_RIGHT);
+        return scene;
     }
     
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
@@ -126,56 +194,59 @@ public class CarcassonneGUI extends Application {
     public GridPane getLeftGridPane(){
         GridPane grid = new GridPane();
         GridPane grid2 = new GridPane();
-        grid.setHgap(75);
-        grid.setVgap(20);
+        grid.setHgap(20);
+        grid.setVgap(40);
         
-        int nJug = 4;
+        int numAux = 200;
         
-        //EFECTES DE TEXT
+        //EFECTES DE TEXT        
         DropShadow ds = new DropShadow();
         ds.setOffsetY(3.0f);
         ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
         ///
         
-        
-        int numAux = 200;
         Text category = new Text("JUGADORS");
         category.setEffect(ds);
         category.setCache(true);
-        category.setFill(Color.BLUE);
-        category.setFont(Font.font(null, FontWeight.BOLD, 16));
+        category.setFill(Color.SILVER);
+        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+
         grid.add(category, 0, 0);
         category = new Text("PUNTUACIO");
         category.setEffect(ds);
         category.setCache(true);
-        category.setFill(Color.BLUE);
+        category.setFill(Color.SILVER);
         category.setFont(Font.font(null, FontWeight.BOLD, 20));
         grid.add(category, 1, 0);
-        for(int i = 0; i < 2; i++){
-            for(int j = 1; j <= nJug; j++){
+        for(int i = 0; i < 3; i++){
+            for(int j = 1; j <= numJug; j++){
                 if(i == 0){
                     category = new Text("Jugador"+ j);
                     category.setEffect(ds);
                     category.setCache(true);
-                    category.setFill(Color.BLUE);
-                    category.setFont(Font.font(null, FontWeight.BOLD, 18));
+                    category.setFill(Color.WHITE);
+                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    grid.add(category, i, j); 
                 }
-                else{
+                else if(i == 1){
                     category = new Text("0");
                     category.setEffect(ds);
                     category.setCache(true);
-                    category.setFill(Color.BLUE);
-                    category.setFont(Font.font(null, FontWeight.BOLD, 18));
+                    category.setFill(Color.WHITE);
+                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    grid.add(category, i, j);
                 }
-                grid.add(category, i, j); 
+                else{
+                    ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + (j-1) + ".png")));
+                    iv.setFitHeight(30);
+                    iv.setFitWidth(25);
+                    grid.add(iv,i,j);
+                }
             }
         }
-        grid.setAlignment(Pos.TOP_RIGHT);
         return grid;
     }
-    
-    
-    
+
     public GridPane getRightGridPane(){
         //CREEM UN NOU GRID PANE DE 1x2
         GridPane grid = new GridPane();
@@ -400,18 +471,6 @@ public class CarcassonneGUI extends Application {
     private void assignarEventListeners(){
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
-            /*if(event.getTransferMode() == TransferMode.MOVE){
-                if(!_joc.getPila().isEmpty()){
-                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
-                    pila.setImage(aux);
-                    pila.setRotate(_joc.peekPila().getIndexRotacio()*90);
-                    numPila.setText(String.valueOf(_joc.getPila().size()));
-                }
-                else{
-                    pila.setVisible(false);
-                    numPila.setText(String.valueOf(_joc.getPila().size()));
-                }
-            }*/
             event.consume();
         }
         });
@@ -437,6 +496,7 @@ public class CarcassonneGUI extends Application {
                     numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
                 mostrarBotons(1);
+                actualitzarPuntuacio(_joc.getTorn()+1,_joc.jugadorN(_joc.getTorn()).getPunts());
                 _joc.jugar();
             }
         });
@@ -502,10 +562,6 @@ public class CarcassonneGUI extends Application {
                 db.setContent(cbContent);
                 event.consume();
             }
-
-            private Rotate newRotate() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
         });
         
         //Drag over event handler is used for the receiving node to allow movement
@@ -517,8 +573,8 @@ public class CarcassonneGUI extends Application {
                     if(node != taul){
                             Integer cIndex = GridPane.getColumnIndex(node);
                             Integer rIndex = GridPane.getRowIndex(node);
-                            int x = cIndex == null ? -1 : cIndex; //SI L'INDEX ES NULL, ES POSA A 0
-                            int y = rIndex == null ? -1 : rIndex; //SI L'INDEX ES NULL, ES POSA A 0
+                            int x = cIndex == null ? -1 : cIndex; //SI L'INDEX ES NULL, ES POSA A -1
+                            int y = rIndex == null ? -1 : rIndex; //SI L'INDEX ES NULL, ES POSA A -1
                             if(x != -1){
                                 int xHash = getXHash(x);
                                 int yHash = getYHash(y);
@@ -581,6 +637,7 @@ public class CarcassonneGUI extends Application {
                                 ajustarImageView(iv);
                                 StackPane casella = new StackPane();
                                 casella.getChildren().add(iv);
+                                taul.getChildren().remove(getNodeFromGridPane(taul,x,y));
                                 taul.add(casella, x, y);
                                 lastxHash = xHash;
                                 lastyHash = yHash;
@@ -600,28 +657,20 @@ public class CarcassonneGUI extends Application {
                                 ImageView iv = new ImageView(aux1);
                                 iv.setRotate(0);
                                 ajustarImageView(iv);
+                                taul.getChildren().remove(getNodeFromGridPane(taul,x,y));
                                 taul.add(iv, x, y);
                                 success = false;
                             }
                         }
                     }
+                Image image = new Image("images/cursor.png");  //pass in the image path
+                escena.setCursor(new ImageCursor(image));
                 //let the source know whether the image was successfully transferred and used
                 event.setDropCompleted(success);
                 event.consume();
             }
         });
-        
-        root.setOnDragDropped(new EventHandler<DragEvent>() {
-            public void handle(DragEvent event) {
-                //Data dropped
-                //If there is an image on the dragboard, read it and use it
-                boolean success = true;
-                passa.setVisible(false);
-                //let the source know whether the image was successfully transferred and used
-                event.setDropCompleted(success);
-                event.consume();
-            }
-        });
+
         
     }
     
@@ -697,6 +746,22 @@ public class CarcassonneGUI extends Application {
             left.setVisible(true);
             right.setVisible(true);
         }
+    }
+    
+    public void actualitzarPuntuacio(int nJugador, int puntuacio){
+        //EFECTES DE TEXT        
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        ///
+        String aux = String.valueOf(puntuacio);
+        Text category = new Text(aux);
+        category.setEffect(ds);
+        category.setCache(true);
+        category.setFill(Color.WHITE);
+        category.setFont(Font.font(null, FontWeight.BOLD, 22));
+        esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador));
+        esquerra.add(category, 1, nJugador);
     }
     
     /**

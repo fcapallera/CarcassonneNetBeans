@@ -38,6 +38,8 @@ public class Joc {
         
         
     }
+    
+    
 
     public void init(String arxiu){
         File f = new File(PROVES_SRC+arxiu+".txt");
@@ -125,7 +127,14 @@ public class Joc {
         }
         else{
             //Jugar amb jugador humà, ergo, no fer res.
-        }
-        
+        }      
+    }
+    
+    public int getnJugadors(){
+        return _jugadors.size();
+    }
+    
+    public Jugador jugadorN(int n){
+        return _jugadors.get(n);
     }
 }
