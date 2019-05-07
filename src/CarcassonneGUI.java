@@ -80,6 +80,7 @@ public class CarcassonneGUI extends Application {
     private Button acabar_torn;
     private Button jugar;
     private TextField nJugadors;
+    private Text tornJugador;
     private ImageView pila;
     private int rotacioPila; 
     private int numJug;
@@ -212,13 +213,13 @@ public class CarcassonneGUI extends Application {
         category.setFont(Font.font(null, FontWeight.BOLD, 20));
 
         grid.add(category, 0, 0);
-        category = new Text("PUNTUACIO");
+        category = new Text("PUNTS");
         category.setEffect(ds);
         category.setCache(true);
         category.setFill(Color.SILVER);
         category.setFont(Font.font(null, FontWeight.BOLD, 20));
         grid.add(category, 1, 0);
-        for(int i = 0; i < 3; i++){
+        for(int i = 0; i < 4; i++){
             for(int j = 1; j <= numJug; j++){
                 if(i == 0){
                     category = new Text("Jugador"+ j);
@@ -236,11 +237,19 @@ public class CarcassonneGUI extends Application {
                     category.setFont(Font.font(null, FontWeight.BOLD, 22));
                     grid.add(category, i, j);
                 }
-                else{
+                else if (i == 2){
                     ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + (j-1) + ".png")));
                     iv.setFitHeight(30);
                     iv.setFitWidth(25);
                     grid.add(iv,i,j);
+                }
+                else{
+                    category = new Text("(x7)");
+                    category.setEffect(ds);
+                    category.setCache(true);
+                    category.setFill(Color.WHITE);
+                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    grid.add(category, i, j);
                 }
             }
         }
@@ -253,6 +262,12 @@ public class CarcassonneGUI extends Application {
         grid.setHgap(0);
         grid.setVgap(10);
         grid.setPadding(new Insets(0, 0, 0, 0));
+        
+        //EFECTES DE TEXT        
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        ///
         
         //CARREGUEM IMATGES DE LA PEÇA SUPERIOR DE LA PILA I DEL BOTÓ "ROTA"
         pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png")));
@@ -288,26 +303,25 @@ public class CarcassonneGUI extends Application {
         left.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         right.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         acabar_torn.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-     
+        tornJugador = new Text("JUGADOR 1");
+        tornJugador.setEffect(ds);
+        tornJugador.setCache(true);
+        tornJugador.setFill(Color.WHITE);
+        tornJugador.setFont(Font.font(null, FontWeight.BOLD, 20));
         
-        //AFEGIM LA IMATGE DE LA PILA I EL BOTÓ AL GRID PANE
-        /*grid.add(numPila,0,0);
-        grid.add(pila, 0, 1);
-        grid.add(rota,0,2);
-        grid.add(passa,0,3);
-        grid.add(afegirSeguidor,0,4);
-        grid.add(colocarSeg,0,5);*/
-        grid.add(numPila,1,0);
-        grid.add(pila, 1, 1);
-        grid.add(rota,1,2);
-        grid.add(passa,1,3);
-        grid.add(afegirSeguidor,1,4);
-        grid.add(acabar_torn,2,4);
-        grid.add(top,1,5);
-        grid.add(center,1,6);
-        grid.add(left,0,6);
-        grid.add(right,2,6);
-        grid.add(bot,1,7);
+        //AFEGIM ELS COMPONENTS AL GRID PANE
+        grid.add(tornJugador,1,0);
+        grid.add(numPila,1,1);
+        grid.add(pila, 1, 2);
+        grid.add(rota,1,3);
+        grid.add(passa,1,4);
+        grid.add(afegirSeguidor,1,5);
+        grid.add(acabar_torn,2,5);
+        grid.add(top,1,6);
+        grid.add(center,1,7);
+        grid.add(left,0,7);
+        grid.add(right,2,7);
+        grid.add(bot,1,8);
         grid.setAlignment(Pos.CENTER);
         pila.setFitHeight(numAux/5);
         pila.setFitWidth(numAux/5);
@@ -496,7 +510,9 @@ public class CarcassonneGUI extends Application {
                     numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
                 mostrarBotons(1);
-                actualitzarPuntuacio(_joc.getTorn()+1,_joc.jugadorN(_joc.getTorn()).getPunts());
+                actualitzarPuntuacio(_joc.getTorn(),1);
+                //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
+                actualitzarTornJugador();
                 _joc.jugar();
             }
         });
@@ -749,19 +765,38 @@ public class CarcassonneGUI extends Application {
     }
     
     public void actualitzarPuntuacio(int nJugador, int puntuacio){
+        if(nJugador == 0){
+            nJugador = _joc.getnJugadors();
+        }
+            //EFECTES DE TEXT        
+            DropShadow ds = new DropShadow();
+            ds.setOffsetY(3.0f);
+            ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+            ///
+            String aux = String.valueOf(puntuacio);
+            Text category = new Text(aux);
+            category.setEffect(ds);
+            category.setCache(true);
+            category.setFill(Color.WHITE);
+            category.setFont(Font.font(null, FontWeight.BOLD, 22));
+            esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador));
+            esquerra.add(category, 1, nJugador);
+    }
+    
+    public void actualitzarTornJugador(){
         //EFECTES DE TEXT        
         DropShadow ds = new DropShadow();
         ds.setOffsetY(3.0f);
         ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
         ///
-        String aux = String.valueOf(puntuacio);
-        Text category = new Text(aux);
+        String aux = String.valueOf(_joc.getTorn()+1);
+        Text category = new Text("JUGADOR "+aux);
         category.setEffect(ds);
         category.setCache(true);
         category.setFill(Color.WHITE);
         category.setFont(Font.font(null, FontWeight.BOLD, 22));
-        esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador));
-        esquerra.add(category, 1, nJugador);
+        dreta.getChildren().remove(getNodeFromGridPane(dreta,1,0));
+        dreta.add(category, 1, 0);
     }
     
     /**
