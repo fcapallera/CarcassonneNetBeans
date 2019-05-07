@@ -56,98 +56,67 @@ public class Tauler {
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             System.out.println(i+": "+r.hashCode());
-            if(adjacents.get(i)==null){
-                _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
-                if(r.get_pertany()==null){
-                    Construccio c;
-                    if(r.get_codi()=='V'){
-                        System.out.println("Nova ciutat");
-                        c = new Vila(r);
-                        _connexions.get(""+r.get_codi()).add(c);
-                        r.set_pertany(c);
-                    }
-                    else if(r.get_codi()=='C'){
-                        System.out.println("Nou cami");
-                        c = new Cami(r);
-                        _connexions.get(""+r.get_codi()).add(c);
-                        r.set_pertany(c);
-                    }
-                } else System.out.println("putae");
-            }
-            else{
-                if(r.get_pertany()==null){
-                    Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
-                    c.addRegio(r);
-                    r.set_pertany(c);
-                    System.out.println("Expansio");
+            if(adjacents.get(i)==null) _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
+            if(r.get_codi()!='F'){
+                if(adjacents.get(i)==null){
+                    if(r.get_pertany()==null){
+                        Construccio c;
+                        if(r.get_codi()=='V'){
+                            System.out.println("Nova ciutat");
+                            c = new Vila(r);
+                            _connexions.get(""+r.get_codi()).add(c);
+                            r.set_pertany(c);
+                        }
+                        else if(r.get_codi()=='C'){
+                            System.out.println("Nou cami");
+                            c = new Cami(r);
+                            _connexions.get(""+r.get_codi()).add(c);
+                            r.set_pertany(c);
+                        }
+                    } else System.out.println("putae");
                 }
                 else{
-                    System.out.println("Fusio");
-                    Construccio a = r.get_pertany();
-                    Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
-                    a.fusionar(b);
-                    _connexions.get(""+r.get_codi()).remove(b);
-                }
-            }
-        }
-        
-        /*Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
-        List<Regio> regions = peça.get_regions();   
-        if(peça.centre()=='V' || peça.centre()=='E'){
-            Regio vila = regions.get(indexs.get("V").get(0));
-            Construccio actual = new Vila(vila);
-            for(int i : indexs.get("V")){
-                if(adjacents.get(i)!=null){
-                    Construccio aux = buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4));
-                    actual.fusionar(aux);
-                    _connexions.get("vila").remove(aux);
-                }
-                else actual.addPendent(peça.hashCode()+hashKeyAdj[i]);
-            }
-            _connexions.get("vila").add(actual);
-        }
-        else if(peça.centre()=='M'){
-            Monestir monestir = new Monestir(null);
-            monestir.set_peça(peça);
-            _connexions.get("monestir").add(monestir);
-        }
-        else{
-            for(int i : indexs.get("V")){
-                if(adjacents.get(i)==null){
-                    Construccio vila = new Vila(peça.getRegio(i));
-                    vila.addPendent(peça.hashCode()+hashKeyAdj[i]);
-                    _connexions.get("vila").add(vila);
-                }
-                else buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
-            }
-        }
-        
-        if(peça.centre()=='X'){
-            for(int i : indexs.get("C")){
-                if(adjacents.get(i)==null){
-                    Construccio cami = new Cami(peça.getRegio(i));
-                    cami.addPendent(peça.hashCode()+hashKeyAdj[i]);
-                    _connexions.get("cami").add(cami);
-                }
-                else buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
-            }
-        }
-        else{
-            if(indexs.get("C").size()>0){
-                Regio cami = regions.get(indexs.get("C").get(0));
-                Construccio actual = new Cami(cami);
-                for(int i : indexs.get("C")){
-                    if(adjacents.get(i)!=null){
-                        Construccio aux = buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4));
-                        actual.fusionar(aux);
-                        _connexions.get("cami").remove(aux);
+                    if(r.get_pertany()==null){
+                        Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
+                        c.addRegio(r);
+                        r.set_pertany(c);
+                        System.out.println("Expansio");
                     }
-                    else actual.addPendent(peça.hashCode()+hashKeyAdj[i]);
+                    else{
+                        System.out.println("Fusio");
+                        Construccio a = r.get_pertany();
+                        Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
+                        a.fusionar(b);
+                        _connexions.get(""+r.get_codi()).remove(b);
+                    }
                 }
-                _connexions.get("cami").add(actual);
             }
-        }*/ 
-        
+        }
+    }
+    
+    public void afegirSeguidor(int x, int y, int pos, Jugador actual){
+        actual.utilitzarSeguidor();
+        Peça peça = getPeça(x,y);
+        Regio regio = peça.getRegio(pos-1);
+        regio.setSeguidor(actual);
+    }
+    
+    public List<Integer> seguidorsValids(int x, int y, Jugador actual){
+        List<Integer> valids = new ArrayList<>();
+        Peça peça = getPeça(x,y);
+        for(int i=0;i<5;i++){
+            Regio regio = peça.getRegio(i);
+            if(regio==null) valids.add(0);
+            else{
+                if(!regio.get_pertany().ocupada()) valids.add(1);
+                else{
+                    List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
+                    if(puntuadors.contains(actual)) valids.add(1);
+                    else valids.add(0);
+                }
+            }
+        }
+        return valids;
     }
 
 
@@ -173,7 +142,7 @@ public class Tauler {
     }
     
     public boolean jugadaValida(Peça peça, int x, int y){
-        if(!_disponibles.contains(100*x+y)) return false;
+        if(!_disponibles.contains(x*100+y)) return false;
         else{
             boolean retorn = true;
             int[] hashKeyAdj = {1,100,-1,-100};

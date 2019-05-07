@@ -4,7 +4,7 @@ import java.util.Objects;
 public class Regio implements Comparable<Regio> {
     final private int _id;
     final private char _codi;
-    private String _seguidor = "";
+    private Jugador _seguidor = null;
     final private boolean _escut = false;
     private Peça _peça;
     private Construccio _pertany = null;
@@ -58,8 +58,9 @@ public class Regio implements Comparable<Regio> {
         return true;
     }
     
-    public void setSeguidor(String seguidor){
+    public void setSeguidor(Jugador seguidor){
         _seguidor = seguidor;
+        _pertany.addSeguidor(seguidor);
     }
     
     public boolean hiHaEscut(){
