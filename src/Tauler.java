@@ -56,9 +56,9 @@ public class Tauler {
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             System.out.println(i+": "+r.hashCode());
+            if(adjacents.get(i)==null) _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
             if(r.get_codi()!='F'){
                 if(adjacents.get(i)==null){
-                    _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
                     if(r.get_pertany()==null){
                         Construccio c;
                         if(r.get_codi()=='V'){
@@ -97,6 +97,24 @@ public class Tauler {
     public void afegirSeguidor(int x, int y, int pos, Jugador actual){
         
     }
+    
+    public List<Integer> seguidorsValids(int x, int y, Jugador actual){
+        List<Integer> valids = new ArrayList<>();
+        Peça peça = getPeça(x,y);
+        for(int i=0;i<5;i++){
+            Regio regio = peça.getRegio(i);
+            if(regio==null) valids.add(0);
+            else{
+                if(!regio.get_pertany().ocupada()) valids.add(1);
+                else{
+                    List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
+                    if(puntuadors.contains(actual)) valids.add(1);
+                    else valids.add(0);
+                }
+            }
+        }      
+        return valids;
+    }
 
 
     public Construccio buscarConstruccio(Regio regio){
@@ -124,16 +142,10 @@ public class Tauler {
         if(!_disponibles.contains(x*100+y)) return false;
         else{
             boolean retorn = true;
+            int[] hashKeyAdj = {1,100,-1,-100};
             for(int i=0;i<4;i++){
-                if(_tauler.containsKey(100*x+y)){
-                    if(!peça.esCompatible(_tauler.get(100*x+y), i)) retorn = false;
-                }
-            }
-            return retorn;
-        }
-    }
-
-}
+                if(_tauler.containsKey(100*x+y+hashKeyAdj[i])){
+                    if(!peça.esCompatible(_tauler.get(100*x+y+hashKeyAdj[i]), i)) retorn = false;
                 }
             }
             return retorn;
