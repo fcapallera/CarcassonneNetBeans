@@ -22,4 +22,8 @@ public class Jugador {
             
         }
     }
+    
+    public int getPunts(){
+        return _punts;
+    }
 }

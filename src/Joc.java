@@ -38,6 +38,8 @@ public class Joc {
         
         
     }
+    
+    
 
     public void init(String arxiu){
         File f = new File(PROVES_SRC+arxiu+".txt");
@@ -112,4 +114,29 @@ public class Joc {
     public Tauler getTaulaJoc(){
         return _tauler;
     }
+    
+    public int getTorn(){
+        return _torn % _jugadors.size();
+    }
+    
+    public void jugar(){
+        //Avança un torn i deixa jugar al seguent jugador
+        
+        if(_jugadors.get(_torn % _jugadors.size()).get_cpu()){
+            //Jugar la CPU
+        }
+        else{
+            //Jugar amb jugador humà, ergo, no fer res.
+        }
+        _torn ++;
+    }
+    
+    public int getnJugadors(){
+        return _jugadors.size();
+    }
+    
+    public Jugador jugadorN(int n){
+        return _jugadors.get(n);
+    }
+    
 }
