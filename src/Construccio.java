@@ -5,6 +5,7 @@ public class Construccio {
     protected Set<Regio> _regions = new HashSet<>();
     protected Map<String,Integer> _seguidors = new HashMap<>();
     protected Set<Integer> _pendents = new HashSet<>();
+    protected boolean _ocupada = false;
 
     public Construccio(Regio regio){
         addRegio(regio);

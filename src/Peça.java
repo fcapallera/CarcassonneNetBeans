@@ -12,8 +12,8 @@ public class Peça implements Comparable<Peça>{
     int _y;
     private String _codi;
     private int _nRotacions = 0;
-    private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));
-    private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null));
+    private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null,null,null,null,null));
+    private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null,null,null,null,null));
     final private Map<String,ArrayList<Integer>> _indexs = new HashMap<>();
 
     @Override

@@ -92,63 +92,9 @@ public class Tauler {
                 }
             }
         }
-        
-        /*Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
-        List<Regio> regions = peça.get_regions();   
-        if(peça.centre()=='V' || peça.centre()=='E'){
-            Regio vila = regions.get(indexs.get("V").get(0));
-            Construccio actual = new Vila(vila);
-            for(int i : indexs.get("V")){
-                if(adjacents.get(i)!=null){
-                    Construccio aux = buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4));
-                    actual.fusionar(aux);
-                    _connexions.get("vila").remove(aux);
-                }
-                else actual.addPendent(peça.hashCode()+hashKeyAdj[i]);
-            }
-            _connexions.get("vila").add(actual);
-        }
-        else if(peça.centre()=='M'){
-            Monestir monestir = new Monestir(null);
-            monestir.set_peça(peça);
-            _connexions.get("monestir").add(monestir);
-        }
-        else{
-            for(int i : indexs.get("V")){
-                if(adjacents.get(i)==null){
-                    Construccio vila = new Vila(peça.getRegio(i));
-                    vila.addPendent(peça.hashCode()+hashKeyAdj[i]);
-                    _connexions.get("vila").add(vila);
-                }
-                else buscarConstruccio("vila",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
-            }
-        }
-        
-        if(peça.centre()=='X'){
-            for(int i : indexs.get("C")){
-                if(adjacents.get(i)==null){
-                    Construccio cami = new Cami(peça.getRegio(i));
-                    cami.addPendent(peça.hashCode()+hashKeyAdj[i]);
-                    _connexions.get("cami").add(cami);
-                }
-                else buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4)).addRegio(regions.get(i));
-            }
-        }
-        else{
-            if(indexs.get("C").size()>0){
-                Regio cami = regions.get(indexs.get("C").get(0));
-                Construccio actual = new Cami(cami);
-                for(int i : indexs.get("C")){
-                    if(adjacents.get(i)!=null){
-                        Construccio aux = buscarConstruccio("cami",adjacents.get(i).getRegio((i+2)%4));
-                        actual.fusionar(aux);
-                        _connexions.get("cami").remove(aux);
-                    }
-                    else actual.addPendent(peça.hashCode()+hashKeyAdj[i]);
-                }
-                _connexions.get("cami").add(actual);
-            }
-        }*/ 
+    }
+    
+    public void afegirSeguidor(int x, int y, int pos, Jugador actual){
         
     }
 
