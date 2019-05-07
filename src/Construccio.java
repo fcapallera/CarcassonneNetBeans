@@ -50,6 +50,10 @@ public class Construccio {
                 .forEach(p -> _pendents.add(p.hashCode()));
     }
     
+    public void addSeguidor(Jugador jugador){
+        _seguidors.put(jugador, _seguidors.getOrDefault(jugador, 0)+1);
+    }
+    
     public void addPendent(Integer pendent){
         _pendents.add(pendent);
     }

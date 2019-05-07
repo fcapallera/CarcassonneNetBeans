@@ -95,7 +95,10 @@ public class Tauler {
     }
     
     public void afegirSeguidor(int x, int y, int pos, Jugador actual){
-        
+        actual.utilitzarSeguidor();
+        Peça peça = getPeça(x,y);
+        Regio regio = peça.getRegio(pos-1);
+        regio.setSeguidor(actual);
     }
     
     public List<Integer> seguidorsValids(int x, int y, Jugador actual){
@@ -112,7 +115,7 @@ public class Tauler {
                     else valids.add(0);
                 }
             }
-        }      
+        }
         return valids;
     }
 

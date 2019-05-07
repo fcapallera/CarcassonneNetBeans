@@ -4,6 +4,7 @@ public class Jugador {
     private boolean _cpu = false;
     private int _punts = 0;
     private String _color;
+    private int _seguidors = 7;
 
     public Jugador(int _id) {
         this._id = _id;
@@ -21,6 +22,14 @@ public class Jugador {
         for(int i=0;i<4;i++){
             
         }
+    }
+    
+    public void utilitzarSeguidor(){
+        _seguidors -= 1;
+    }
+    
+    public void tornarSeguidor(){
+        _seguidors += 1;
     }
     
     public int getPunts(){

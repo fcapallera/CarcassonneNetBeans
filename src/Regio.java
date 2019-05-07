@@ -60,6 +60,7 @@ public class Regio implements Comparable<Regio> {
     
     public void setSeguidor(Jugador seguidor){
         _seguidor = seguidor;
+        _pertany.addSeguidor(seguidor);
     }
     
     public boolean hiHaEscut(){
