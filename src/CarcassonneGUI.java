@@ -514,14 +514,14 @@ public class CarcassonneGUI extends Application {
                 ///////////////////////////////////////AQUI AQUI FCAP////////////////////////////////////////////////////
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////
                 
-                //List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
+                List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
                 
-                /*for(int i = 0; i <= 4; i++){
+                for(int i = 0; i <= 4; i++){
                     System.out.println(aux.get(i));
                     if(aux.get(i) == 1){
                         mostrarBotons(10+i);
                     }
-                }*/
+                }
                 
                 mostrarBotons(3);
                 

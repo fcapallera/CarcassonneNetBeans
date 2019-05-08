@@ -112,8 +112,8 @@ public class Tauler {
         List<Integer> valids = new ArrayList<>();
         Peça peça = getPeça(x,y);
         for(int i=0;i<5;i++){
-            Regio regio = peça.getRegio(i);
-            if(regio==null) valids.add(0);
+            Regio regio = peça.getRegio(i-1);
+            if(regio==null || regio.get_codi()=='F') valids.add(0);
             else{
                 if(!regio.get_pertany().ocupada()) valids.add(1);
                 else{

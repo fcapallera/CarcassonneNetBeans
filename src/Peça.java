@@ -124,6 +124,7 @@ public class Peça implements Comparable<Peça>{
         else{
             if(_codi.indexOf('C')>(-1)){
                 Regio p = new Regio(nReg+n,this,'C');
+                if(c=='C') _regions.set(0,p);
                 n++;
                 for(int i=1;i<5;i++){
                     if(_codi.charAt(i)=='C') _regions.set(i, p);
