@@ -56,6 +56,7 @@ public class Tauler {
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             System.out.println(i+": "+r.hashCode());
+            
             if(adjacents.get(i)==null){
                 _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
                 if(r.get_pertany()==null){
@@ -90,6 +91,7 @@ public class Tauler {
                 }
             }
         }
+       
         
         /*Map<String,ArrayList<Integer>> indexs = peça.get_indexs();
         List<Regio> regions = peça.get_regions();   
