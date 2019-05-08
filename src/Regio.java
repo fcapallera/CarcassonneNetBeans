@@ -67,6 +67,10 @@ public class Regio implements Comparable<Regio> {
         return _escut;
     }
     
+    public boolean hiHaSeguidor(){
+        return _seguidor != null;
+    }
+    
     public Peça get_peça(){
         return _peça;
     }

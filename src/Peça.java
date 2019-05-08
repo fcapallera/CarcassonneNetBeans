@@ -84,7 +84,7 @@ public class Peça implements Comparable<Peça>{
     }
     
     public Regio getRegio(int r){
-        if(r < 0 || r > 4) throw new IndexOutOfBoundsException("Index "+r+" is out of bounds");
+        if(r < -1 || r > 4) throw new IndexOutOfBoundsException("Index "+r+" is out of bounds");
         else return _regions.get(r+1);
     }
     
