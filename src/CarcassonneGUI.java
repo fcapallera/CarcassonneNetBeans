@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
@@ -88,7 +89,10 @@ public class CarcassonneGUI extends Application {
     private Text numPila;
     private int lastxHash;
     private int lastyHash;
+    private int lastxHashSeguidor;
+    private int lastyHashSeguidor;
     private Scene escena;
+    private Pos lastPos;
     
 
     
@@ -405,9 +409,21 @@ public class CarcassonneGUI extends Application {
         //OBTENIM LA X I LA Y HASH I LES TRANSFORMEM A LES X I Y DEL TAULER
         //AFEGIM LA IMATGE A LA SEVA POSICIO CORRESPONENT DEL GRID PANE
         Iterator it = _joc.getTaulaJoc().getTauler().entrySet().iterator();
+        boolean teSeguidor = false;
+        int seguidor = -1;
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
             Peça aux =(Peça) pair.getValue();
+            teSeguidor = false;
+            seguidor = -1;
+            for(int i = 0; i <= 4 ; i++){
+                if(aux.getRegio(i-1)!=null){
+                    if(aux.getRegio(i-1).hiHaSeguidor()){
+                        teSeguidor = true;
+                        seguidor = i;
+                    }
+                }
+            }
             ImageView aux2 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + aux.get_codi() + ".png")));
             aux2.setRotate(aux.getIndexRotacio()*90);
             int aux_x = getXTauler(aux.get_x());
@@ -415,6 +431,9 @@ public class CarcassonneGUI extends Application {
             ajustarImageView(aux2);
             StackPane casella = new StackPane();
             casella.getChildren().add(aux2);
+            if(teSeguidor){
+                afegirSeguidorStack(seguidor, casella);
+            }
             nouGrid.add(casella,aux_x,aux_y);
         }
         //ACTUALITZEM EL CENTRE DEL BORDER PANE AMB EL NOSTRE TAULER NOU I CRIDEM ELS EVENT LISTENERS PERQUÈ SE LI APLIQUIN
@@ -491,7 +510,21 @@ public class CarcassonneGUI extends Application {
         
         afegirSeguidor.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ///////////////////////////////////////AQUI AQUI FCAP////////////////////////////////////////////////////
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                
+                //List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
+                
+                /*for(int i = 0; i <= 4; i++){
+                    System.out.println(aux.get(i));
+                    if(aux.get(i) == 1){
+                        mostrarBotons(10+i);
+                    }
+                }*/
+                
                 mostrarBotons(3);
+                
             }
         });
         
@@ -511,8 +544,12 @@ public class CarcassonneGUI extends Application {
                 }
                 mostrarBotons(1);
                 actualitzarPuntuacio(_joc.getTorn(),1);
+                if(lastPos != null){
+                    inserirSeguidor();
+                }
                 //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
                 actualitzarTornJugador();
+                lastPos = null;
                 _joc.jugar();
             }
         });
@@ -725,6 +762,7 @@ public class CarcassonneGUI extends Application {
         int x = getXTauler(lastxHash);
         int y = getYTauler(lastyHash);
         taul.add(sp,x,y);
+        lastPos = value;
     }
     
     private void amagarBotons(int n){
@@ -762,6 +800,21 @@ public class CarcassonneGUI extends Application {
             left.setVisible(true);
             right.setVisible(true);
         }
+        else if(n == 10){
+            center.setVisible(true);
+        }
+        else if(n == 11){
+            top.setVisible(true);
+        }
+        else if(n == 12){
+            right.setVisible(true);
+        }
+        else if(n == 13){
+            bot.setVisible(true);
+        }
+        else if(n == 14){
+            left.setVisible(true);
+        }
     }
     
     public void actualitzarPuntuacio(int nJugador, int puntuacio){
@@ -797,6 +850,37 @@ public class CarcassonneGUI extends Application {
         category.setFont(Font.font(null, FontWeight.BOLD, 22));
         dreta.getChildren().remove(getNodeFromGridPane(dreta,1,0));
         dreta.add(category, 1, 0);
+    }
+    
+    private void inserirSeguidor(){
+        if(lastPos == Pos.CENTER){
+            _joc.getTaulaJoc().afegirSeguidor(lastxHash, lastyHash, 0, _joc.jugadorN(_joc.getTorn()));
+        }
+        else if(lastPos == Pos.CENTER_LEFT){
+            _joc.getTaulaJoc().afegirSeguidor(lastxHash, lastyHash, 4, _joc.jugadorN(_joc.getTorn()));
+        }
+        else if(lastPos == Pos.CENTER_RIGHT){
+            _joc.getTaulaJoc().afegirSeguidor(lastxHash, lastyHash, 2, _joc.jugadorN(_joc.getTorn()));
+        }
+        else if(lastPos == Pos.TOP_CENTER){
+            _joc.getTaulaJoc().afegirSeguidor(lastxHash, lastyHash, 1, _joc.jugadorN(_joc.getTorn()));
+        }
+        else if(lastPos == Pos.BOTTOM_CENTER){
+            _joc.getTaulaJoc().afegirSeguidor(lastxHash, lastyHash, 3, _joc.jugadorN(_joc.getTorn()));
+        }
+    }
+    
+    private void afegirSeguidorStack(int pos, StackPane sp){
+        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
+        ajustarSeguidor(aux);
+        sp.getChildren().add(aux);
+        Pos value = null;
+        if(pos == 0) value = Pos.CENTER;
+        else if(pos == 1) value = Pos.TOP_CENTER;
+        else if(pos == 2) value = Pos.CENTER_RIGHT;
+        else if(pos == 3) value = Pos.BOTTOM_CENTER;
+        else if(pos == 4) value = Pos.CENTER_LEFT;
+        StackPane.setAlignment(aux,value);
     }
     
     /**
