@@ -53,6 +53,13 @@ public class Tauler {
         peça.set_adjacents(adjacents);
         System.out.println("arriba");
         
+        //Comprovació de peça amb Monestir
+        if(peça.centre()=='M'){
+            Regio m = peça.getRegio(-1);
+            Construccio c = new Monestir(m);
+            m.set_pertany(c);
+        }
+        
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
             System.out.println(i+": "+r.hashCode());

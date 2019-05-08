@@ -32,6 +32,8 @@ public class Construccio {
 
     public void fusionar(Construccio c){
         _regions.addAll(c.get_regions());
+        for(Regio r : c.get_regions()) r.set_pertany(this);
+        
         for (Map.Entry pair : c.get_seguidors().entrySet()) {
             Jugador clau = (Jugador) pair.getKey();
             if(_seguidors.containsKey(clau)){
