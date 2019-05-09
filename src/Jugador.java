@@ -39,4 +39,8 @@ public class Jugador {
     public int getPunts(){
         return _punts;
     }
+    
+    public int getSeguidors(){
+        return _seguidors;
+    }
 }
