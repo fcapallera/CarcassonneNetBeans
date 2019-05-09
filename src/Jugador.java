@@ -32,8 +32,12 @@ public class Jugador {
         _seguidors -= 1;
     }
     
-    public void tornarSeguidor(){
-        _seguidors += 1;
+    public void tornarSeguidor(int s){
+        _seguidors += s;
+    }
+        
+    public void sumarPunts(int punts){
+        _punts += punts;
     }
     
     public int getPunts(){

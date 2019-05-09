@@ -9,10 +9,12 @@ public class Construccio {
 
     public Construccio(Regio regio){
         addRegio(regio);
-        regio.set_pertany(this);
+        regio.set_pertany(this);    
     }
 
-    public int puntuar(){return _regions.size();}
+    public int puntuar(){
+        return _regions.size();
+    }
 
     public List<Jugador> quiPuntua(){
         Iterator it = _seguidors.entrySet().iterator();
@@ -29,6 +31,13 @@ public class Construccio {
         }
         return puntuadors;
     }
+    
+    public void tornarSeguidors(){
+        List<Jugador> puntuadors = quiPuntua();
+        for(Jugador j : puntuadors){
+            if(_seguidors.containsKey(j)) j.tornarSeguidor(_seguidors.get(j));
+        }
+    }
 
     public void fusionar(Construccio c){
         _regions.addAll(c.get_regions());
@@ -42,15 +51,19 @@ public class Construccio {
             }
             else _seguidors.put(clau,(Integer)pair.getValue());
         }
-        _pendents.retainAll(c.get_pendents());
+        _pendents.addAll(c.get_pendents());
+        for(Regio r : _regions) _pendents.remove(r.get_peça().hashCode());
+        for(Integer i : _pendents) System.out.println(i);
     }
 
     public void addRegio(Regio regio){
         _regions.add(regio);
-        _pendents.remove(regio.get_peça());
-        regio.get_peça().get_adjacents().stream()
-                .filter(adj -> adj !=null)
-                .forEach(p -> _pendents.add(p.hashCode()));
+        _pendents.remove(regio.get_peça().hashCode());
+        Peça actual = regio.get_peça();
+        int[] hashKeyAdj = {1,100,-1,-100};
+        for(int i = 0;i<4;i++){
+            if(actual.getRegio(i)==regio && actual.getPeçaAdjacent(i)==null) _pendents.add(actual.hashCode()+hashKeyAdj[i]);
+        }
     }
     
     public void addSeguidor(Jugador jugador){
@@ -76,6 +89,10 @@ public class Construccio {
 
     public Map<Jugador, Integer> get_seguidors() {
         return _seguidors;
+    }
+    
+    public boolean completada(){
+        return _pendents.size() == 0;
     }
     
     public Set<Integer> get_pendents(){

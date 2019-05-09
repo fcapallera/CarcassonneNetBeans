@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Tauler {
     private Map<Integer,Peça> _tauler = new HashMap<>();
-    private Map<String, ArrayList<Construccio>> _connexions = new HashMap<>();
+    private Map<String, List<Construccio>> _connexions = new HashMap<>();
     private Set<Integer> _disponibles = new HashSet<>();
     private int _maxX = 0;
     private int _minX = 0;
@@ -29,7 +29,6 @@ public class Tauler {
     }
     
     public void afegirPeça(Peça peça, int x, int y){
-        System.out.println("Peça afegida ("+x+","+y+")");
         actualitzarCotes(x,y);
         peça.set_x(x);
         peça.set_y(y);
@@ -51,7 +50,6 @@ public class Tauler {
             } else adjacents.add(null);
         }
         peça.set_adjacents(adjacents);
-        System.out.println("arriba");
         
         //Comprovació de peça amb Monestir
         if(peça.centre()=='M'){
@@ -62,35 +60,30 @@ public class Tauler {
         
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
-            System.out.println(i+": "+r.hashCode());
             if(adjacents.get(i)==null) _disponibles.add(peça.hashCode()+hashKeyAdj[i]);
             if(r.get_codi()!='F'){
                 if(adjacents.get(i)==null){
                     if(r.get_pertany()==null){
                         Construccio c;
                         if(r.get_codi()=='V'){
-                            System.out.println("Nova ciutat");
                             c = new Vila(r);
                             _connexions.get(""+r.get_codi()).add(c);
                             r.set_pertany(c);
                         }
                         else if(r.get_codi()=='C'){
-                            System.out.println("Nou cami");
                             c = new Cami(r);
                             _connexions.get(""+r.get_codi()).add(c);
                             r.set_pertany(c);
                         }
-                    } else System.out.println("putae");
+                    }
                 }
                 else{
                     if(r.get_pertany()==null){
                         Construccio c = adjacents.get(i).getRegio((i+2)%4).get_pertany();
                         c.addRegio(r);
                         r.set_pertany(c);
-                        System.out.println("Expansio");
                     }
                     else{
-                        System.out.println("Fusio");
                         Construccio a = r.get_pertany();
                         Construccio b = adjacents.get(i).getRegio((i+2)%4).get_pertany();
                         a.fusionar(b);
@@ -118,7 +111,6 @@ public class Tauler {
                 if(!regio.get_pertany().ocupada()) valids.add(1);
                 else{
                     List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
-                    for(Jugador j : puntuadors) System.out.println(j.getId());
                     if(puntuadors.contains(actual)) valids.add(1);
                     else valids.add(0);
                 }
@@ -160,6 +152,24 @@ public class Tauler {
                 }
             }
             return retorn;
+        }
+    }
+    
+    public void actualitzarPuntuacions(){
+        Iterator it = _connexions.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            List<Construccio> llista = (List<Construccio>)pair.getValue();
+            Iterator<Construccio> iter = llista.iterator();
+            while(iter.hasNext()){
+                Construccio c = iter.next();
+                if(c.completada()){
+                    List<Jugador> puntuadors = c.quiPuntua();
+                    for(Jugador j : puntuadors) j.sumarPunts(c.puntuar());
+                    c.tornarSeguidors();
+                    iter.remove();
+                }
+            }
         }
     }
 
