@@ -32,6 +32,7 @@ public class Construccio {
 
     public void fusionar(Construccio c){
         _regions.addAll(c.get_regions());
+        if(c.ocupada()) _ocupada = true;
         for(Regio r : c.get_regions()) r.set_pertany(this);
         
         for (Map.Entry pair : c.get_seguidors().entrySet()) {
