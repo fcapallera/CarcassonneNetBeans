@@ -144,8 +144,6 @@ public class CarcassonneGUI extends Application {
                 root.setCenter(taul);
                 root.setLeft(esquerra);
                 assignarEventListeners();
-                actualitzarPuntuacio(1,10);
-                actualitzarPuntuacio(2,20);
                 primaryStage.setScene(escena);
                 primaryStage.setMaximized(true);
             }
@@ -553,6 +551,7 @@ public class CarcassonneGUI extends Application {
                 }
                 //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
                 lastPos = null;
+                actualitzarSeguidors(_joc.getTorn());
                 actualitzarTornJugador();
                 _joc.jugar();
                 _joc.passarTorn();
@@ -822,9 +821,6 @@ public class CarcassonneGUI extends Application {
     }
     
     public void actualitzarPuntuacio(int nJugador, int puntuacio){
-        if(nJugador == 0){
-            nJugador = _joc.getnJugadors();
-        }
             //EFECTES DE TEXT        
             DropShadow ds = new DropShadow();
             ds.setOffsetY(3.0f);
@@ -836,8 +832,25 @@ public class CarcassonneGUI extends Application {
             category.setCache(true);
             category.setFill(Color.WHITE);
             category.setFont(Font.font(null, FontWeight.BOLD, 22));
-            esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador));
-            esquerra.add(category, 1, nJugador);
+            esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador+1));
+            esquerra.add(category, 1, nJugador+1);
+    }
+    
+    public void actualitzarSeguidors(int nJugador){
+        //EFECTES DE TEXT        
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        ///
+        String aux1 = String.valueOf(_joc.jugadorN(nJugador).getSeguidors());
+        String aux = "(x"+aux1+")";
+        Text category = new Text(aux);
+        category.setEffect(ds);
+        category.setCache(true);
+        category.setFill(Color.WHITE);
+        category.setFont(Font.font(null, FontWeight.BOLD, 22));
+        esquerra.getChildren().remove(getNodeFromGridPane(esquerra,3,nJugador+1));
+        esquerra.add(category, 3, nJugador+1);
     }
     
     public void actualitzarTornJugador(){
