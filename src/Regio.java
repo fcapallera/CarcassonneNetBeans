@@ -86,4 +86,8 @@ public class Regio implements Comparable<Regio> {
     public Construccio get_pertany(){
         return _pertany;
     }
+    
+    public Jugador getJugador(){
+        return _seguidor;
+    }
 }
