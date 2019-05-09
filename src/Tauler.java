@@ -118,6 +118,7 @@ public class Tauler {
                 if(!regio.get_pertany().ocupada()) valids.add(1);
                 else{
                     List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
+                    for(Jugador j : puntuadors) System.out.println(j.getId());
                     if(puntuadors.contains(actual)) valids.add(1);
                     else valids.add(0);
                 }
