@@ -518,7 +518,6 @@ public class CarcassonneGUI extends Application {
                 List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
                 
                 for(int i = 0; i <= 4; i++){
-                    System.out.println(aux.get(i));
                     if(aux.get(i) == 1){
                         mostrarBotons(10+i);
                     }
@@ -754,7 +753,6 @@ public class CarcassonneGUI extends Application {
     private void afegirSeguidor(Pos value){
         ImageView aux1 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
         ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
-        System.out.println("SI: "+_joc.getTorn());
         ajustarImageView(aux1);
         ajustarSeguidor(aux);
         aux1.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);

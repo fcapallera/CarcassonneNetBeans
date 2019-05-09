@@ -128,6 +128,7 @@ public class Joc {
         else{
             //Jugar amb jugador humà, ergo, no fer res.
         }
+        _tauler.actualitzarPuntuacions();
     }
     
     public int getnJugadors(){
