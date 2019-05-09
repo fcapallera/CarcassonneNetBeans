@@ -154,6 +154,7 @@ public class CarcassonneGUI extends Application {
         
         
         _joc.jugar();
+        
     }
     
     private Scene triarNJugadors(){
@@ -416,7 +417,8 @@ public class CarcassonneGUI extends Application {
             Peça aux =(Peça) pair.getValue();
             teSeguidor = false;
             seguidor = -1;
-            for(int i = 0; i <= 4 ; i++){
+            int i;
+            for(i = 0; i <= 4 ; i++){
                 if(aux.getRegio(i-1)!=null){
                     if(aux.getRegio(i-1).hiHaSeguidor()){
                         teSeguidor = true;
@@ -432,7 +434,8 @@ public class CarcassonneGUI extends Application {
             StackPane casella = new StackPane();
             casella.getChildren().add(aux2);
             if(teSeguidor){
-                afegirSeguidorStack(seguidor, casella);
+                Jugador jug = aux.getRegio(seguidor-1).getJugador();
+                afegirSeguidorStack(seguidor, casella,jug);
             }
             nouGrid.add(casella,aux_x,aux_y);
         }
@@ -522,8 +525,9 @@ public class CarcassonneGUI extends Application {
                         mostrarBotons(10+i);
                     }
                 }
+               
                 
-                mostrarBotons(3);
+                //mostrarBotons(3);
                 
             }
         });
@@ -548,9 +552,10 @@ public class CarcassonneGUI extends Application {
                     inserirSeguidor();
                 }
                 //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
-                actualitzarTornJugador();
                 lastPos = null;
+                actualitzarTornJugador();
                 _joc.jugar();
+                _joc.passarTorn();
             }
         });
         
@@ -700,10 +705,8 @@ public class CarcassonneGUI extends Application {
                                 if(esLimit(x,y)){
                                     resizeTauler(x,y);
                                 }
-                                
                                 amagarBotons(2);
                                 mostrarBotons(2);
-                                
                             }
                             else{
                                 Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
@@ -752,6 +755,7 @@ public class CarcassonneGUI extends Application {
     private void afegirSeguidor(Pos value){
         ImageView aux1 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
         ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
+        System.out.println("SI: "+_joc.getTorn());
         ajustarImageView(aux1);
         ajustarSeguidor(aux);
         aux1.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);
@@ -870,8 +874,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
-    private void afegirSeguidorStack(int pos, StackPane sp){
-        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
+    private void afegirSeguidorStack(int pos, StackPane sp,Jugador jug){
+        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+jug.getId()+".png")));
+        //ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
         ajustarSeguidor(aux);
         sp.getChildren().add(aux);
         Pos value = null;
@@ -881,6 +886,10 @@ public class CarcassonneGUI extends Application {
         else if(pos == 3) value = Pos.BOTTOM_CENTER;
         else if(pos == 4) value = Pos.CENTER_LEFT;
         StackPane.setAlignment(aux,value);
+    }
+    
+    public int getNumJug(){
+        return numJug;
     }
     
     /**

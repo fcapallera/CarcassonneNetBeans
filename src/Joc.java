@@ -128,7 +128,6 @@ public class Joc {
         else{
             //Jugar amb jugador humà, ergo, no fer res.
         }
-        _torn ++;
     }
     
     public int getnJugadors(){
@@ -137,6 +136,10 @@ public class Joc {
     
     public Jugador jugadorN(int n){
         return _jugadors.get(n);
+    }
+    
+    public void passarTorn(){
+        _torn++;
     }
     
 }

@@ -18,6 +18,10 @@ public class Jugador {
         return _cpu;
     }
     
+    public int getId(){
+        return _id;
+    }
+    
     public void jugarCpu(Tauler tauler){
         for(int i=0;i<4;i++){
             
