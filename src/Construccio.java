@@ -54,6 +54,7 @@ public class Construccio {
     
     public void addSeguidor(Jugador jugador){
         _seguidors.put(jugador, _seguidors.getOrDefault(jugador, 0)+1);
+        _ocupada = true;
     }
     
     public void addPendent(Integer pendent){
