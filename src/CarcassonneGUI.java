@@ -513,19 +513,17 @@ public class CarcassonneGUI extends Application {
             @Override public void handle(ActionEvent e) {
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////
                 ///////////////////////////////////////AQUI AQUI FCAP////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                
-                List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
-                
-                for(int i = 0; i <= 4; i++){
-                    if(aux.get(i) == 1){
-                        mostrarBotons(10+i);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////  
+                if(_joc.jugadorN(_joc.getTorn()).getSeguidors()>0){
+                    List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
+                    for(int i = 0; i <= 4; i++){
+                        if(aux.get(i) == 1){
+                            mostrarBotons(10+i);
+                        }
                     }
                 }
-               
                 
-                //mostrarBotons(3);
-                
+                //mostrarBotons(3);       
             }
         });
         
@@ -544,16 +542,20 @@ public class CarcassonneGUI extends Application {
                     numPila.setText(String.valueOf(_joc.getPila().size()));
                 }
                 mostrarBotons(1);
-                actualitzarPuntuacio(_joc.getTorn(),1);
+                
+                
                 if(lastPos != null){
                     inserirSeguidor();
                 }
                 //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
                 lastPos = null;
                 actualitzarSeguidors(_joc.getTorn());
+                _joc.passarTorn();
                 actualitzarTornJugador();
                 _joc.jugar();
-                _joc.passarTorn();
+                for(int i=0;i < _joc.getnJugadors();i++){
+                    actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
+                }
             }
         });
         
@@ -841,6 +843,7 @@ public class CarcassonneGUI extends Application {
         ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
         ///
         String aux1 = String.valueOf(_joc.jugadorN(nJugador).getSeguidors());
+        System.out.println("AAAAAAAAAAAAAAA     "+_joc.jugadorN(nJugador).getSeguidors());
         String aux = "(x"+aux1+")";
         Text category = new Text(aux);
         category.setEffect(ds);
