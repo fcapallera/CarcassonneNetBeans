@@ -17,7 +17,9 @@ public class Cami extends Construccio {
     @Override
     public int puntuar(){
         Set<Peça> peces = new TreeSet<>();
-        for(Regio r : _regions) peces.add(r.get_peça());
+        _regions.forEach((r) -> {
+            peces.add(r.get_peça());
+        });
         return peces.size();
     }
 }
