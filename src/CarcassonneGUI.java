@@ -65,7 +65,6 @@ public class CarcassonneGUI extends Application {
     private int col;
     private int row;   
     private BorderPane root;
-    private GridPane root0;
     private BorderPane colocarSeg;
     private GridPane taul;
     private GridPane dreta;
@@ -93,12 +92,14 @@ public class CarcassonneGUI extends Application {
     private int lastyHashSeguidor;
     private Scene escena;
     private Pos lastPos;
+    private Stage _primaryStage;
     
 
     
     @Override
     public void start(Stage primaryStage) {
-        _joc = new Joc("2");
+        _primaryStage = primaryStage;
+        _joc = new Joc("1");
         row = 3;
         col = 3;
         numAux = 690;
@@ -129,7 +130,6 @@ public class CarcassonneGUI extends Application {
         jugar.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 numJug = Integer.parseInt(nJugadors.getText());
-
                 taul = getCenterGridPane();
                 dreta = getRightGridPane();
                 esquerra = getLeftGridPane();
@@ -162,7 +162,7 @@ public class CarcassonneGUI extends Application {
         ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
         ///
         
-        root0 = new GridPane();
+        GridPane root0 = new GridPane();
         Scene scene = new Scene(root0, 800, 449);
         Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper1.jpg"));
         BackgroundSize bSize = new BackgroundSize(root0.getWidth(), root0.getHeight(), false, false, true, false);
@@ -510,10 +510,7 @@ public class CarcassonneGUI extends Application {
         });
         
         afegirSeguidor.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                //////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ///////////////////////////////////////AQUI AQUI FCAP////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////  
+            @Override public void handle(ActionEvent e) {  
                 if(_joc.jugadorN(_joc.getTorn()).getSeguidors()>0){
                     List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
                     for(int i = 0; i <= 4; i++){
@@ -540,6 +537,11 @@ public class CarcassonneGUI extends Application {
                 else{
                     pila.setVisible(false);
                     numPila.setText(String.valueOf(_joc.getPila().size()));
+                    passa.setVisible(false);
+                    rota.setVisible(false);
+                    escena = acabarJoc();
+                    _primaryStage.setScene(escena);
+                    _primaryStage.show();
                 }
                 mostrarBotons(1);
                 
@@ -578,6 +580,11 @@ public class CarcassonneGUI extends Application {
                 else{
                     pila.setVisible(false);
                     numPila.setText(String.valueOf(_joc.getPila().size()));
+                    passa.setVisible(false);
+                    rota.setVisible(false);
+                    escena = acabarJoc();
+                    _primaryStage.setScene(escena);
+                    _primaryStage.show();
                 }
                 
             }
@@ -904,6 +911,63 @@ public class CarcassonneGUI extends Application {
     
     public int getNumJug(){
         return numJug;
+    }
+    
+    public Scene acabarJoc(){
+        //EFECTES DE TEXT        
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        ///
+        
+        GridPane root0 = new GridPane();
+        root0.setHgap(20);
+        root0.setVgap(40);
+        Scene scene = new Scene(root0, 800, 449);
+        //Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper1.jpg"));
+        BackgroundSize bSize = new BackgroundSize(root0.getWidth(), root0.getHeight(), false, false, true, false);
+        /*root0.setBackground(new Background(new BackgroundImage(image2,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                bSize)));*/
+        Text category = new Text("JUGADOR");
+        Text category1 = new Text("PUNTS");
+        category.setEffect(ds);
+        category.setCache(true);
+        category.setFill(Color.BLUE);
+        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+        category1.setEffect(ds);
+        category1.setCache(true);
+        category1.setFill(Color.BLUE);
+        category1.setFont(Font.font(null, FontWeight.BOLD, 20));
+        root0.add(category, 0,0);
+        root0.add(category1,1,0);
+        //Obtenir jugadors en una array ordenats per puntuacio
+        ArrayList<Jugador> jug = new ArrayList();//FCAP UN METODE QUE ELS RETORNI(?)
+        for(int i=0; i<jug.size();i++){
+            Text t = new Text("JUGADOR "+jug.get(i).getId());
+            Text t1 = new Text(String.valueOf(jug.get(i).getPunts()));
+            ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + jug.get(i).getId() + ".png")));
+            t.setEffect(ds);
+            t.setCache(true);
+            t.setFill(Color.BLUE);
+            t.setFont(Font.font(null, FontWeight.BOLD, 20));
+            t1.setEffect(ds);
+            t1.setCache(true);
+            t1.setFill(Color.BLUE);
+            t1.setFont(Font.font(null, FontWeight.BOLD, 20));
+            iv.setFitHeight(30);
+            iv.setFitWidth(25);
+            root0.add(t,0,i+1);
+            root0.add(t1,1,i+1);
+            root0.add(iv,2,i+1);
+        }
+        
+        
+        
+        root0.setAlignment(Pos.CENTER);
+        return scene;
     }
     
     /**
