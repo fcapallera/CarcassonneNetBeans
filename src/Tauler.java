@@ -28,6 +28,14 @@ public class Tauler {
         return _maxY;
     }
     
+    public boolean contains(Peça peça){
+        return _tauler.containsKey(peça.hashCode());
+    }
+    
+    public boolean contains(Integer hash){
+        return _tauler.containsKey(hash);
+    }
+    
     public void afegirPeça(Peça peça, int x, int y){
         actualitzarCotes(x,y);
         peça.set_x(x);
@@ -43,10 +51,6 @@ public class Tauler {
                 Peça adj = _tauler.get(peça.hashCode()+hashKeyAdj[i]);
                 adjacents.add(adj);
                 adj.setPeçaAdjacent(peça,(i+2)%4);
-                //Comprovar monestirs adjacents
-                if(adj.centre()=='M'){
-                    for(Construccio m : _connexions.get("M")) m.removePendent(peça.hashCode());
-                }
             } else adjacents.add(null);
         }
         peça.set_adjacents(adjacents);
@@ -55,8 +59,13 @@ public class Tauler {
         if(peça.centre()=='M'){
             Regio m = peça.getRegio(-1);
             Construccio c = new Monestir(m);
+            ((Monestir)c).setPendents(this, peça);
             m.set_pertany(c);
+            _connexions.get("M").add(c);
         }
+        
+        //Actualitzem les peces pendents dels possibles monestirs adjacents
+        actualitzarMonestirs(peça);
         
         for(int i=0;i<4;i++){
             Regio r = peça.getRegio(i);
@@ -171,6 +180,11 @@ public class Tauler {
                 }
             }
         }
+    }
+    
+    private void actualitzarMonestirs(Peça peça){
+        List<Construccio> monestirs = _connexions.get("M");
+        for(Construccio m : monestirs) m.removePendent(peça.hashCode());
     }
 
 }

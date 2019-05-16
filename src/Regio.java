@@ -5,7 +5,7 @@ public class Regio implements Comparable<Regio> {
     final private int _id;
     final private char _codi;
     private Jugador _seguidor = null;
-    final private boolean _escut = false;
+    private boolean _escut = false;
     private Peça _peça;
     private Construccio _pertany = null;
 
@@ -19,6 +19,7 @@ public class Regio implements Comparable<Regio> {
         this._id = _id;
         this._peça = peça;
         this._codi = codi;
+        _escut = escut;
     }
 
     @Override
