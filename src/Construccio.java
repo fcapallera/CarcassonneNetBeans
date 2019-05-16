@@ -17,25 +17,22 @@ public class Construccio {
     }
 
     public List<Jugador> quiPuntua(){
-        Iterator it = _seguidors.entrySet().iterator();
         int maxSeg = 0;
         ArrayList<Jugador> puntuadors = new ArrayList<>();
-        while(it.hasNext()){
-            Map.Entry pair = (Map.Entry)it.next();
-            if((Integer)pair.getValue()>maxSeg){
-                maxSeg = (Integer)pair.getValue();
-                puntuadors = new ArrayList<>();
-                puntuadors.add((Jugador)pair.getKey());
+        for(Map.Entry<Jugador,Integer> entry : _seguidors.entrySet()){
+            if(entry.getValue()>maxSeg){
+                maxSeg = entry.getValue();
+                puntuadors.clear();
+                puntuadors.add(entry.getKey());
             }
-            else if((Integer)pair.getValue()==maxSeg) puntuadors.add((Jugador)pair.getKey());
+            else if(entry.getValue()==maxSeg) puntuadors.add(entry.getKey());
         }
         return puntuadors;
     }
     
     public void tornarSeguidors(){
-        List<Jugador> puntuadors = quiPuntua();
-        for(Jugador j : puntuadors){
-            if(_seguidors.containsKey(j)) j.tornarSeguidor(_seguidors.get(j));
+        for(Map.Entry<Jugador,Integer> entry : _seguidors.entrySet()){
+            entry.getKey().tornarSeguidor(entry.getValue());
         }
     }
 
@@ -97,6 +94,10 @@ public class Construccio {
     
     public Set<Integer> get_pendents(){
         return _pendents;
+    }
+    
+    public void set_pendents(Set<Integer> pendents){
+        _pendents = pendents;
     }
     
     public boolean ocupada(){
