@@ -36,7 +36,7 @@ public class Construccio {
         }
         for(Regio regio : _regions){
             regio.set_pertany(null);
-            regio.setSeguidor(null);
+            regio.esborrarSeguidor();
         }
     }
 
