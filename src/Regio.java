@@ -64,6 +64,10 @@ public class Regio implements Comparable<Regio> {
         _pertany.addSeguidor(seguidor);
     }
     
+    public void esborrarSeguidor(){
+        _seguidor = null;
+    }
+    
     public boolean hiHaEscut(){
         return _escut;
     }
