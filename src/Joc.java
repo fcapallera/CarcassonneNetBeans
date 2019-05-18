@@ -28,20 +28,19 @@ public class Joc {
     private int _torn;
     private boolean _jugat;
     
-    public Joc(String arxiu){
+    public Joc(String arxiu,int nJ){
         _peces = new Stack<Peça>();
         _jugadors = new ArrayList<Jugador>();
         _tauler = new Tauler(false);
         _torn = 0;
         _jugat = false;
-        this.init(arxiu);
-        
+        this.init(arxiu,nJ);
         
     }
     
     
 
-    public void init(String arxiu){
+    public void init(String arxiu, int nJ){
         File f = new File(PROVES_SRC+arxiu+".txt");
         HashMap<String,Integer> peces = new HashMap<>();
         int n = 0;
@@ -52,6 +51,7 @@ public class Joc {
             //Llegim els jugadors
             if(lector.hasNext() && lector.next().equals("nombre_jugadors")){
                 int njugs = lector.nextInt();
+                njugs = nJ;
                 for(int i=0;i<njugs;i++) _jugadors.add(new Jugador(i));
                 if(lector.hasNext() && lector.next().equals("jugadors_cpu")){
                     while(lector.hasNextInt()){
