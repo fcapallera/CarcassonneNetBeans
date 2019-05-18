@@ -99,7 +99,7 @@ public class CarcassonneGUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         _primaryStage = primaryStage;
-        _joc = new Joc("1");
+        _joc = new Joc("2");
         row = 3;
         col = 3;
         numAux = 690;

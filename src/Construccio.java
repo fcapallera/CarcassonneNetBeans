@@ -34,6 +34,10 @@ public class Construccio {
         for(Map.Entry<Jugador,Integer> entry : _seguidors.entrySet()){
             entry.getKey().tornarSeguidor(entry.getValue());
         }
+        for(Regio regio : _regions){
+            regio.set_pertany(null);
+            regio.setSeguidor(null);
+        }
     }
 
     public void fusionar(Construccio c){
