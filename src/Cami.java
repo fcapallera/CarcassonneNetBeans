@@ -1,19 +1,22 @@
+/** @file Cami.java
+    @brief Classe Cami
+*/
 import java.util.Set;
 import java.util.TreeSet;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author usuario
- */
+/** @class Cami
+    @brief 
+    @author 
+*/
 public class Cami extends Construccio {
+    /** @brief Constructor de Cami
+	@pre 
+	@post  */
     public Cami(Regio regio){ super(regio);}
     
+    /** @brief 
+	@pre 
+	@post */
     @Override
     public int puntuar(){
         Set<Peça> peces = new TreeSet<>();

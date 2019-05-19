@@ -1,8 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** @file CarcassonneGUI.java
+    @brief Classe CarcassonneGUI
+*/
 
 import javafx.scene.image.Image ;
 import java.util.ArrayList;
@@ -41,47 +39,58 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 
-/**
- *
- * @author usuario
- */
-public class CarcassonneGUI extends Application {
-    private int numAux;
-    private int col;
-    private int row;   
-    private BorderPane root;
-    private BorderPane colocarSeg;
-    private GridPane taul;
-    private GridPane dreta;
-    private GridPane esquerra;
-    private Button rota;
-    private Button passa;
-    private Button afegirSeguidor;
-    private Button top;
-    private Button bot;
-    private Button left;
-    private Button right;
-    private Button center;
-    private Button acabar_torn;
-    private Button jugar;
-    private TextField nJugadors;
-    private Text tornJugador;
-    private ImageView pila;
-    private int rotacioPila; 
-    private int numJug;
-    private Joc _joc;
-    private Text numPila;
+/** @class CarcassonneGUI
+    @brief Interfície gràfica del Joc
+    @author Adrià Orellana Cruañas
+*/
+public class CarcassonneGUI extends Application {   
+    private Stage _primaryStage;///< Finestra on visualitzarem les Pantalles
+    private Scene escena;///< Pantalla on veurem el Joc i jugarem 
+    
+    private BorderPane root;///< BorderPane serà la base del elements del Joc
+    
+    private GridPane taul;///< Representa el tauler on posem les peces del Joc
+    private int numAux;///< nº de Pixels màxims que pot fer el Tauler
+    private int col;///< nº de columnes del Tauler
+    private int row;///< nº de files del Tauler
+    
+    private GridPane dreta;///< Part de la Pantalla on veurem la Pila de peces i controls del Joc
+    private Button rota;///< Botó per rotar 90º la peça
+    private Button passa;///< Botó per passar de carta
+    private Button afegirSeguidor;///< Botó per desplegar les opcions per posar Seguidor
+    private Button top;///< Botó per posar un seguidor a Nort de la Peça
+    private Button bot;///< Botó per posar un seguidor a Sud de la Peça
+    private Button left;///< Botó per posar un seguidor a Oest de la Peça
+    private Button right;///< Botó per posar un seguidor a Est de la Peça
+    private Button center;///< Botó per posar un seguidor al Centre de la Peça
+    private Button acabar_torn;///< Botó per passar torn
+    private ImageView pila;///< ImageView on visualitzarem les Peces per posar al Tauler, fent un Drag&Drop
+    private int rotacioPila;///< nº de vegades que s'ha girat la Peça 90º
+    private Text numPila;///< Text on visualitzarem el nº de cartes que queden a la pila 
+    private Text tornJugador;///< Text on visualitzarem el Jugador que està jugant en el torn actual
+    
+    private GridPane esquerra;///< Part de la pantalla on veurem les puntuacions dels Jugadors i els seguidors que els queden
+    
+    private Button jugar;///< Botó de la pantalla per triar jugadors, per iniciar el Joc
+    private TextField nJugadors;///< TextField on entrarem el nº de jugadors del Joc a la pantalla per triar jugadors
+    
+    
+    private Joc _joc;///< Joc al que jugarem i visualitzarem en aquesta GUI
+    
+    private int numJug;///< nº de jugadors del Joc
+    
+    //Per temes de funcionament dels Listeners, necessitem guardar 
+    //unes quantes dades que es necessiten d'un Listener a un altre
     private int lastxHash;
     private int lastyHash;
     private int lastxHashSeguidor;
     private int lastyHashSeguidor;
-    private Scene escena;
     private Pos lastPos;
-    private Stage _primaryStage;
-
     
-
     
+    /** @brief Inicia els components de la GUI
+	@pre --
+	@post Components de la GUI inicialitzats*/
     @Override
     public void start(Stage primaryStage) {
         _primaryStage = primaryStage;
@@ -137,6 +146,9 @@ public class CarcassonneGUI extends Application {
         }); 
     }
     
+    /** @brief Construeix i retorna la pantalla per triar el nº de jugadors
+	@pre --
+	@post Retorna una Scene on triarem el nº de jugadors del joc */
     private Scene triarNJugadors(){
         //INICIALITZACIÓ DEL GRID PANE
         GridPane root0 = new GridPane();
@@ -161,6 +173,9 @@ public class CarcassonneGUI extends Application {
         return scene;
     }
     
+    /** @brief Retorna el Node seleccionat del GridPane passat per paràmetres
+	@pre --
+	@post Retorna node de gridPane, posició(col,row). Retorna null si és fora de rang */
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -170,6 +185,9 @@ public class CarcassonneGUI extends Application {
         return null;
     }
     
+    /** @brief Inicialitza el GridPane de la part esquerra de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part esquerra de la pantalla de Joc */
     public GridPane getLeftGridPane(){
         int numAux = 200;
 
@@ -217,7 +235,10 @@ public class CarcassonneGUI extends Application {
         
         return grid;
     }
-
+    
+    /** @brief Inicialitza el GridPane de la part dreta de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part dreta de la pantalla de Joc */
     public GridPane getRightGridPane(){
         //CREEM UN NOU GRID PANE
         GridPane grid = new GridPane();
@@ -293,6 +314,9 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
+    /** @brief Inicialitza el GridPane de la part central de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part central de la pantalla de Joc */
     public GridPane getCenterGridPane(){
         //CREEM EL GRID PANE BUIT
         GridPane grid = gridPaneBuit(row,col);
@@ -307,7 +331,9 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
-
+    /** @brief Comprova si la posició passada per paràmetres és limit del Tauler
+	@pre --
+	@post Retorna cert si (x,y) és límit del Tauler de Joc */
     private boolean esLimit(int x, int y){
         boolean res = false;
         if(x == 0 || y == 0 || x == col-1 || y == row-1){
@@ -316,6 +342,9 @@ public class CarcassonneGUI extends Application {
         return res;
     }
     
+    /** @brief Inicialitza un GridPane buit
+	@pre --
+	@post Retorna un gridPane de mida (x,y) */
     private GridPane gridPaneBuit(int x, int y){
         //CREEM UN GRID PANE DE (x,y) I L'OMPLIM, A TOTES LES POSICIONS, AMB LA IMATGE QUE SIMBOLITZA "CASELLA BUIDA"
         GridPane res = new GridPane();
@@ -337,6 +366,9 @@ public class CarcassonneGUI extends Application {
         return res;
     }
     
+    /** @brief Actualitza el tauler de Joc
+	@pre --
+	@post Tauler de Joc actualitzat. Si x,y és límit, s'amplia el Tauler */
     private void refreshTauler(int x, int y){
         //MIREM QUINA VARIABLE HEM D'INCREMENTAR
         if(x == 0 && y == 0 || x == 0 && y == row-1 || y == 0 && x == col-1 || x == col-1 && y == row-1){
@@ -403,6 +435,9 @@ public class CarcassonneGUI extends Application {
         assignarEventListeners();
     }
     
+    /** @brief Comprova si la Peça pot anar en aquesta posició del Tauler
+	@pre --
+	@post Retorna cert si la Peça pot anar a la posició (x,y) del tauler */
     private boolean adjacenciesValides(int x, int y){ //X i Y del gridPane
         boolean compatible = false;
 	boolean valid = true;
@@ -443,26 +478,41 @@ public class CarcassonneGUI extends Application {
         return compatible;
     }
     
+    /** @brief Transforma la X del map del Tauler de Joc equivalent a la X del map de Joc
+	@pre --
+	@post Retorna la X del map del Tauler de Joc transformada a X del Tauler*/
     private int getXTauler(int xHash){
         int res = xHash - _joc.getTaulaJoc().getMinX() + 1;
         return res;
     }
     
+    /** @brief Transforma la Y del map del Tauler de Joc equivalent a la Y del map de Joc
+	@pre --
+	@post Retorna la Y del map del Tauler de Joc transformada a Y del Tauler*/
     private int getYTauler(int yHash){
         int res = (yHash*(-1)) + _joc.getTaulaJoc().getMaxY() + 1;
         return res;
     }
     
+    /** @brief Transforma la X del tauler equivalent a la X del map del Tauler de Joc
+	@pre --
+	@post Retorna la X del Tauler transformada a X del map del Tauler de Joc */
     private int getXHash(int x){
         int res = x + _joc.getTaulaJoc().getMinX() - 1;
         return res;                      
     }
     
+    /** @brief Transforma la Y del tauler equivalent a la Y del map del Tauler de Joc
+	@pre --
+	@post Retorna la Y del Tauler transformada a Y del map del Tauler de Joc */
     private int getYHash(int y){
         int res = (y - _joc.getTaulaJoc().getMaxY() - 1)/(-1);
         return res;
     }
     
+    /** @brief Assigna les funcions que fan tots els components de la GUI
+	@pre --
+	@post Components amb EventListeners inicialitzats*/
     private void assignarEventListeners(){
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
@@ -697,6 +747,9 @@ public class CarcassonneGUI extends Application {
         
     }
     
+    /** @brief Ajusta l'ImageView a la mida corresponent
+	@pre --
+	@post ImageView ajustat segons les columnes i files del Tauler*/
     private void ajustarImageView(ImageView iv){
         if(row >= col){
             iv.setFitHeight(numAux/row);
@@ -708,6 +761,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Ajusta l'ImageView a la mida corresponent
+	@pre --
+	@post ImageView ajustat segons les columnes i files del Tauler*/
     private void ajustarSeguidor(ImageView iv){
         if(row >= col){
             iv.setFitHeight((numAux/row)/3.5);
@@ -719,6 +775,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Afegeix la imatge d'un seguidor a una casella
+	@pre --
+	@post Afegeix un seguidor a la posicio value de l'ultima peça inserida*/
     private void afegirSeguidor(Pos value){
         ImageView imatgePeça = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
         ImageView imatgeSeguidor = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
@@ -737,6 +796,9 @@ public class CarcassonneGUI extends Application {
         lastPos = value;
     }
     
+    /** @brief Mostra certs botons del Joc
+	@pre --
+	@post es mostren certs botons del Joc*/
     public void refreshBotons(int[] aux,boolean mostrar){
         Button[] buttons = new Button[]{passa,rota,afegirSeguidor,acabar_torn,center,top,right,bot,left};
         for(int i = 0;i < aux.length; i++){
@@ -746,6 +808,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Mostra els botons per afegir seguidor
+	@pre --
+	@post es mostren els botons indicats per afegir seguidor*/
     public void mostrarBotonsSeguidor(List<Integer> aux){
         Button[] buttons = new Button[]{center,top,right,bot,left};
         for(int i = 0;i < 5; i++){
@@ -755,6 +820,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief S'actualitzen les puntuacions dels jugadors
+	@pre --
+	@post puntuacions actualitzades*/
     public void actualitzarPuntuacio(int nJugador, int puntuacio){
             String aux = String.valueOf(puntuacio);
             Text category = new Text(aux);
@@ -763,6 +831,9 @@ public class CarcassonneGUI extends Application {
             esquerra.add(category, 1, nJugador+1);
     }
     
+    /** @brief S'actualitzen els seguidors de cada Jugador
+	@pre --
+	@post seguidors actualitzats*/
     public void actualitzarSeguidors(){        
         for(int i = 0; i < numJug; i++){
             String aux1 = String.valueOf(_joc.jugadorN(i).getSeguidors());
@@ -774,6 +845,9 @@ public class CarcassonneGUI extends Application {
         }     
     }
     
+    /** @brief Actualitza el jugador que està jugant en el torn actual
+	@pre --
+	@post Jugador que està jugant, actualitzat*/
     public void actualitzarTornJugador(){
         String aux = String.valueOf(_joc.getTorn()+1);
         Text category = new Text("JUGADOR "+aux);
@@ -800,6 +874,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Afegeix la imatge d'un seguidor en una Peça
+	@pre --
+	@post S'ha afegit la imatge d'un seguidor a la posició indicada a l'StackPane passat per paràmetres*/
     private void afegirSeguidorStack(int pos, StackPane sp,Jugador jug){
         Pos[] posicions = new Pos[]{Pos.CENTER,Pos.TOP_CENTER,Pos.CENTER_RIGHT,Pos.BOTTOM_CENTER,Pos.CENTER_LEFT};
         ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+jug.getId()+".png")));
@@ -809,10 +886,16 @@ public class CarcassonneGUI extends Application {
         StackPane.setAlignment(aux,value);
     }
     
+    /** @brief Retorna el nº de Jugadors del Joc
+	@pre --
+	@post retorna numJug*/
     public int getNumJug(){
         return numJug;
     }
     
+    /** @brief Retorna la pantalla final amb les puntuacions dels jugadors i el guanyador
+	@pre --
+	@post retorna la pantalla final del Joc*/
     public Scene acabarJoc(){        
         GridPane root0 = new GridPane();
         root0.setHgap(20);
@@ -848,7 +931,9 @@ public class CarcassonneGUI extends Application {
         return scene;
     }
     
-    
+    /** @brief Aplica un estil al Text
+	@pre --
+	@post estil aplicat al Text passat per paràmetres*/
     public void aplicarStyleText(Text t,Color c,int size){
             //EFECTES DE TEXT        
             DropShadow ds = new DropShadow();
@@ -860,11 +945,9 @@ public class CarcassonneGUI extends Application {
             t.setFill(c);
             t.setFont(Font.font(null, FontWeight.BOLD, size));
     }
-    
-    
-    /**
-     * @param args the command line arguments
-     */
+
+    /** @brief Main de l'aplicació
+        @param args the command line arguments*/
     public static void main(String[] args) {
         launch(args);
     }
