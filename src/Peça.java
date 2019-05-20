@@ -93,7 +93,12 @@ public class Peça implements Comparable<Peça>{
         transf.add(_regions.get(1)); transf.add(_regions.get(2));
         transf.add(_regions.get(3));
         _regions = transf;
-        _nRotacions++;
+        _nRotacions = (_nRotacions+1)%4;
+    }
+    
+    
+    public void rotarFins(int pos){
+        while(_nRotacions != pos) rotarClockWise();
     }
     
     /** @brief Ens mira si la peça actual és compatible, en l'orientació passada per paràmetres, amb la Peça també passada per paràmetres
@@ -322,6 +327,6 @@ public class Peça implements Comparable<Peça>{
 	@pre --
 	@post Retorna _nRotacions%4 */
     public int getIndexRotacio(){
-        return _nRotacions % 4;
+        return _nRotacions;
     }
 }

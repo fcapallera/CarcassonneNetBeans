@@ -22,6 +22,17 @@ public class Construccio {
         regio.set_pertany(this);    
     }
     
+    @Override
+    public boolean equals(Object other){
+        if(other == this) return true;
+        
+        if(!(other instanceof Construccio)) return false;
+        
+        Construccio c = (Construccio)other;
+        
+        return _regions.equals(c.get_regions());
+    }
+    
     /** @brief Retorna el tamany del Set de Regions
 	@pre 
 	@post  */
@@ -52,6 +63,7 @@ public class Construccio {
     public void tornarSeguidors(){
         for(Map.Entry<Jugador,Integer> entry : _seguidors.entrySet()){
             entry.getKey().tornarSeguidor(entry.getValue());
+            entry.getKey().removeConstruccio(this);
         }
         for(Regio regio : _regions){
             regio.set_pertany(null);
@@ -98,6 +110,7 @@ public class Construccio {
     public void addSeguidor(Jugador jugador){
         _seguidors.put(jugador, _seguidors.getOrDefault(jugador, 0)+1);
         _ocupada = true;
+        jugador.addConstruccio(this);
     }
     
     /** @brief 

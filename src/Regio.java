@@ -34,6 +34,17 @@ public class Regio implements Comparable<Regio> {
         _escut = escut;
     }
     
+    @Override
+    public boolean equals(Object other){
+        if(other == this) return true;
+        
+        if(!(other instanceof Regio)) return false;
+        
+        Regio r = (Regio)other;
+        
+        return this._id == r.get_id();
+    }
+    
     /** @brief Es sobreescriu el mètode compareTo que ens compara els codis de les Regions
 	@pre 
 	@post  */
@@ -50,35 +61,14 @@ public class Regio implements Comparable<Regio> {
         return _id;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Regio other = (Regio) obj;
-        if (this._id != other._id) {
-            return false;
-        }
-        if (this._escut != other._escut) {
-            return false;
-        }
-        if (!Objects.equals(this._seguidor, other._seguidor)) {
-            return false;
-        }
-        if (!Objects.equals(this._peça, other._peça)) {
-            return false;
-        }
-        return true;
+    
+    /** @brief Retorna la Id de la Regio
+	@pre --
+	@post retorna _id */
+    public int get_id() {
+        return _id;
     }
+    
     
     /** @brief Canvia el jugador propietari del seguidor de la Regio
 	@pre --
