@@ -186,5 +186,16 @@ public class Tauler {
         List<Construccio> monestirs = _connexions.get("M");
         for(Construccio m : monestirs) m.removePendent(peça.hashCode());
     }
+    
+    public static class Posicio {
+        public int _x;
+        public int _y;
+        
+        public Posicio(Integer hash){
+            double xAppr = hash/100;
+            _x = (int) Math.round(xAppr);
+            _y = hash - _x;
+        }
+    }
 
 }
