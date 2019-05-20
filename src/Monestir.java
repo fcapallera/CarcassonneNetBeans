@@ -1,19 +1,17 @@
-
+/** @file Monestir.java
+    @brief Classe Monestir
+*/
 import java.util.HashSet;
 import java.util.Set;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author usuario
- */
+/** @class Monestir
+    @brief 
+    @author 
+*/
 public class Monestir extends Construccio {
-    
+    /** @brief 
+	@pre 
+	@post  */
     public Monestir(Regio regio) {
         super(regio);
         Peça peça = regio.get_peça();
@@ -23,11 +21,17 @@ public class Monestir extends Construccio {
         }
     }
     
+    /** @brief 
+	@pre 
+	@post  */
     @Override
     public int puntuar(){
         return 9 - _pendents.size();
     }
     
+    /** @brief 
+	@pre 
+	@post  */
     public void setPendents(Tauler tauler, Peça peça){
         int[] hashKeyAdj = {100,101,1,-99,-100,-101,-1,99};
         Set<Integer> pendents = new HashSet<>();

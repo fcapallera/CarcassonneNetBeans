@@ -1,37 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/** @file CarcassonneGUI.java
+    @brief Classe CarcassonneGUI
+*/
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import javafx.scene.image.Image ;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.Stack;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -45,100 +31,109 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 
-/**
- *
- * @author usuario
- */
-public class CarcassonneGUI extends Application {
-    private int numAux;
-    private int col;
-    private int row;   
-    private BorderPane root;
-    private BorderPane colocarSeg;
-    private GridPane taul;
-    private GridPane dreta;
-    private GridPane esquerra;
-    private Button rota;
-    private Button passa;
-    private Button afegirSeguidor;
-    private Button top;
-    private Button bot;
-    private Button left;
-    private Button right;
-    private Button center;
-    private Button acabar_torn;
-    private Button jugar;
-    private TextField nJugadors;
-    private Text tornJugador;
-    private ImageView pila;
-    private int rotacioPila; 
-    private int numJug;
-    private Joc _joc;
-    private Text numPila;
+/** @class CarcassonneGUI
+    @brief Interfície gràfica del Joc
+    @author Adrià Orellana Cruañas
+*/
+public class CarcassonneGUI extends Application {   
+    private Stage _primaryStage;///< Finestra on visualitzarem les Pantalles
+    private Scene escena;///< Pantalla on veurem el Joc i jugarem 
+    
+    private BorderPane root;///< BorderPane serà la base del elements del Joc
+    
+    private GridPane taul;///< Representa el tauler on posem les peces del Joc
+    private int numAux;///< nº de Pixels màxims que pot fer el Tauler
+    private int col;///< nº de columnes del Tauler
+    private int row;///< nº de files del Tauler
+    
+    private GridPane dreta;///< Part de la Pantalla on veurem la Pila de peces i controls del Joc
+    private Button rota;///< Botó per rotar 90º la peça
+    private Button passa;///< Botó per passar de carta
+    private Button afegirSeguidor;///< Botó per desplegar les opcions per posar Seguidor
+    private Button top;///< Botó per posar un seguidor a Nort de la Peça
+    private Button bot;///< Botó per posar un seguidor a Sud de la Peça
+    private Button left;///< Botó per posar un seguidor a Oest de la Peça
+    private Button right;///< Botó per posar un seguidor a Est de la Peça
+    private Button center;///< Botó per posar un seguidor al Centre de la Peça
+    private Button acabar_torn;///< Botó per passar torn
+    private ImageView pila;///< ImageView on visualitzarem les Peces per posar al Tauler, fent un Drag&Drop
+    private int rotacioPila;///< nº de vegades que s'ha girat la Peça 90º
+    private Text numPila;///< Text on visualitzarem el nº de cartes que queden a la pila 
+    private Text tornJugador;///< Text on visualitzarem el Jugador que està jugant en el torn actual
+    
+    private GridPane esquerra;///< Part de la pantalla on veurem les puntuacions dels Jugadors i els seguidors que els queden
+    
+    private Button jugar;///< Botó de la pantalla per triar jugadors, per iniciar el Joc
+    private TextField nJugadors;///< TextField on entrarem el nº de jugadors del Joc a la pantalla per triar jugadors
+    
+    
+    private Joc _joc;///< Joc al que jugarem i visualitzarem en aquesta GUI
+    
+    private int numJug;///< nº de jugadors del Joc
+    
+    //Per temes de funcionament dels Listeners, necessitem guardar 
+    //unes quantes dades que es necessiten d'un Listener a un altre
     private int lastxHash;
     private int lastyHash;
     private int lastxHashSeguidor;
     private int lastyHashSeguidor;
-    private Scene escena;
     private Pos lastPos;
-    private Stage _primaryStage;
     
-
     
+    /** @brief Inicia els components de la GUI
+	@pre --
+	@post Components de la GUI inicialitzats*/
     @Override
     public void start(Stage primaryStage) {
         _primaryStage = primaryStage;
-        _joc = new Joc("2");
         row = 3;
         col = 3;
+        rotacioPila = 0;
         numAux = 690;
         root = new BorderPane();
         Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper.jpg"));
-
         BackgroundSize bSize = new BackgroundSize(root.getWidth(), root.getHeight(), false, false, true, false);
-
-
         root.setBackground(new Background(new BackgroundImage(image2,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 bSize)));
-        
-        rotacioPila = 0;
-        
-        Scene scene = new Scene(root, 1000, 600);
-        Scene scene1 = triarNJugadors();
+             
         Image image = new Image("images/cursor.png");  //pass in the image path
+        Scene scene = new Scene(root, 1000, 600);
         scene.setCursor(new ImageCursor(image));
         escena = scene;
+        
+        
+        //CREEM LA PANTALLA PER SELECCIONAR EL NUMERO DE JUGADORS I LA MOSTREM
+        Scene scene1 = triarNJugadors();
         primaryStage.setTitle("CARCASSONNE");
         primaryStage.setScene(scene1);
         primaryStage.setMaximized(false);
         primaryStage.show();
         
+        //INICIALITZEM LES ESTRUCTURES UNA VEGADA CLICKEM AL BOTO JUGAR
         jugar.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 numJug = Integer.parseInt(nJugadors.getText());
+                _joc = new Joc("2",numJug);
                 taul = getCenterGridPane();
                 dreta = getRightGridPane();
                 esquerra = getLeftGridPane();
-                root.setAlignment(taul,Pos.CENTER);
                 BorderPane.setAlignment(dreta,Pos.CENTER);
                 BorderPane.setAlignment(esquerra,Pos.TOP_CENTER);
                 BorderPane.setMargin(taul, new Insets(30, 10, 10, 50));
                 BorderPane.setMargin(dreta, new Insets(10, 50, 10, 10));
                 BorderPane.setMargin(esquerra, new Insets(10, 50, 10, 10));
+                root.setAlignment(taul,Pos.CENTER);
                 root.setRight(dreta);
                 taul.setAlignment(Pos.CENTER);
                 root.setCenter(taul);
@@ -146,46 +141,41 @@ public class CarcassonneGUI extends Application {
                 assignarEventListeners();
                 primaryStage.setScene(escena);
                 primaryStage.setMaximized(true);
+                _joc.jugar();
             }
-        });
-        
-        
-        
-        _joc.jugar();
-        
+        }); 
     }
     
+    /** @brief Construeix i retorna la pantalla per triar el nº de jugadors
+	@pre --
+	@post Retorna una Scene on triarem el nº de jugadors del joc */
     private Scene triarNJugadors(){
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
-        
+        //INICIALITZACIÓ DEL GRID PANE
         GridPane root0 = new GridPane();
-        Scene scene = new Scene(root0, 800, 449);
         Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper1.jpg"));
         BackgroundSize bSize = new BackgroundSize(root0.getWidth(), root0.getHeight(), false, false, true, false);
-        root0.setBackground(new Background(new BackgroundImage(image2,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                bSize)));
+        root0.setBackground(new Background(new BackgroundImage(image2,BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.CENTER,bSize)));
+        root0.setAlignment(Pos.BOTTOM_RIGHT);
+        
+        //INICIALITZEM ELS ELEMENTS QUE ANIRAN AL GRID PANE
         Text category = new Text("N Jugadors (2-5)");
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.SILVER);
-        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+        aplicarStyleText(category,Color.SILVER,20);
         nJugadors = new TextField ();
-        HBox hb = new HBox();
         jugar = new Button("Jugar");
+        
+        //AFEGIM ELS ELEMENTS AL GRID PANE
         root0.add(category, 0,0);
         root0.add(nJugadors,1,0);
         root0.add(jugar,1,1);
-        root0.setAlignment(Pos.BOTTOM_RIGHT);
+        
+        //AFEGIM EL GRID PANE A L'ESCENA I LA RETORNEM
+        Scene scene = new Scene(root0, 800, 449);
         return scene;
     }
     
+    /** @brief Retorna el Node seleccionat del GridPane passat per paràmetres
+	@pre --
+	@post Retorna node de gridPane, posició(col,row). Retorna null si és fora de rang */
     private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
         for (Node node : gridPane.getChildren()) {
             if (GridPane.getColumnIndex(node) == col && GridPane.getRowIndex(node) == row) {
@@ -195,49 +185,38 @@ public class CarcassonneGUI extends Application {
         return null;
     }
     
+    /** @brief Inicialitza el GridPane de la part esquerra de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part esquerra de la pantalla de Joc */
     public GridPane getLeftGridPane(){
+        int numAux = 200;
+
+        //INICIALITZACIO DEL GRID PANE
         GridPane grid = new GridPane();
         GridPane grid2 = new GridPane();
         grid.setHgap(20);
         grid.setVgap(40);
         
-        int numAux = 200;
         
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
-        
+        //INICIALITZEM ELS ELEMENTS I ELS INSERIM AL GRID PANE
         Text category = new Text("JUGADORS");
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.SILVER);
-        category.setFont(Font.font(null, FontWeight.BOLD, 20));
-
+        aplicarStyleText(category,Color.SILVER,20);
         grid.add(category, 0, 0);
+        
         category = new Text("PUNTS");
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.SILVER);
-        category.setFont(Font.font(null, FontWeight.BOLD, 20));
+        aplicarStyleText(category,Color.SILVER,20);
         grid.add(category, 1, 0);
+        
         for(int i = 0; i < 4; i++){
             for(int j = 1; j <= numJug; j++){
                 if(i == 0){
                     category = new Text("Jugador"+ j);
-                    category.setEffect(ds);
-                    category.setCache(true);
-                    category.setFill(Color.WHITE);
-                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    aplicarStyleText(category,Color.WHITE,22);
                     grid.add(category, i, j); 
                 }
                 else if(i == 1){
                     category = new Text("0");
-                    category.setEffect(ds);
-                    category.setCache(true);
-                    category.setFill(Color.WHITE);
-                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    aplicarStyleText(category,Color.WHITE,22);
                     grid.add(category, i, j);
                 }
                 else if (i == 2){
@@ -248,69 +227,72 @@ public class CarcassonneGUI extends Application {
                 }
                 else{
                     category = new Text("(x7)");
-                    category.setEffect(ds);
-                    category.setCache(true);
-                    category.setFill(Color.WHITE);
-                    category.setFont(Font.font(null, FontWeight.BOLD, 22));
+                    aplicarStyleText(category,Color.WHITE,22);
                     grid.add(category, i, j);
                 }
             }
         }
+        
         return grid;
     }
-
+    
+    /** @brief Inicialitza el GridPane de la part dreta de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part dreta de la pantalla de Joc */
     public GridPane getRightGridPane(){
-        //CREEM UN NOU GRID PANE DE 1x2
+        //CREEM UN NOU GRID PANE
         GridPane grid = new GridPane();
         grid.setHgap(0);
         grid.setVgap(10);
         grid.setPadding(new Insets(0, 0, 0, 0));
         
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
-        
-        //CARREGUEM IMATGES DE LA PEÇA SUPERIOR DE LA PILA I DEL BOTÓ "ROTA"
+        //INICIALITZEM ELS ELEMENTS QUE HI HAURÀ AL GRID PANE
         pila = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png")));
+        pila.setFitHeight(numAux/5);
+        pila.setFitWidth(numAux/5);
+        
         rota = new Button();
         rota.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/button.png"))));
+        rota.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         passa = new Button();
         passa.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/next.png"))));
+        passa.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         afegirSeguidor = new Button();
         afegirSeguidor.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/afegirSeguidor.png"))));
+        afegirSeguidor.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         top = new Button();
         top.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/top.png"))));
+        top.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         bot = new Button();
         bot.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/bot.png"))));
+        bot.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         left = new Button();
         left.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/left.png"))));
+        left.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         right = new Button();
         right.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/right.png"))));
+        right.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         center = new Button();
         center.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/center.png"))));
+        center.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         acabar_torn = new Button();
         acabar_torn.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/acabar_torn.png"))));
-        numPila = new Text();
-        numPila.setCache(true);
-        numPila.setFill(Color.WHITE);
-        numPila.setFont(Font.font(null, FontWeight.BOLD, 26));
-        numPila.setText(String.valueOf(_joc.getPila().size()));
-        passa.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        rota.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        afegirSeguidor.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        top.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        bot.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        center.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        left.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
-        right.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         acabar_torn.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
+        numPila = new Text();
+        aplicarStyleText(numPila,Color.WHITE,26);
+        numPila.setText(String.valueOf(_joc.getPila().size()));
+        
         tornJugador = new Text("JUGADOR 1");
-        tornJugador.setEffect(ds);
-        tornJugador.setCache(true);
-        tornJugador.setFill(Color.WHITE);
-        tornJugador.setFont(Font.font(null, FontWeight.BOLD, 20));
+        aplicarStyleText(tornJugador,Color.WHITE,20);
         
         //AFEGIM ELS COMPONENTS AL GRID PANE
         grid.add(tornJugador,1,0);
@@ -326,37 +308,32 @@ public class CarcassonneGUI extends Application {
         grid.add(right,2,7);
         grid.add(bot,1,8);
         grid.setAlignment(Pos.CENTER);
-        pila.setFitHeight(numAux/5);
-        pila.setFitWidth(numAux/5);
-        amagarBotons(1);
         
-        
-        
-        
+        refreshBotons(new int[]{0,0,1,1,1,1,1,1,1},false);
+
         return grid;
     }
     
+    /** @brief Inicialitza el GridPane de la part central de la Pantalla de Joc
+	@pre --
+	@post Retorna el gridPane de la part central de la pantalla de Joc */
     public GridPane getCenterGridPane(){
-        //CREEM EL GRID PANE
+        //CREEM EL GRID PANE BUIT
         GridPane grid = gridPaneBuit(row,col);
         
-        //ITEREM EL MAP DE PECES AL TAULER PER OBTENIR LA SEVA IMATGE
-        Iterator it = _joc.getTaulaJoc().getTauler().entrySet().iterator();
-        Map.Entry pair = (Map.Entry)it.next();
-        Peça aux =(Peça) pair.getValue();
+        //AGAFEM EL CODI DE LA PEÇA INICIAL I L'INSERIM
+        Peça aux = _joc.getTaulaJoc().getTauler().get(0);
         ImageView imageChart = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + aux.get_codi() + ".png")));
-        
-        //AJUSTEM LA IMATGE I LA INSERIM AL SEU LLOC CORRESPONENT
-        ajustarImageView(imageChart);
+        ajustarImageView(imageChart); 
         int aux_x = getXTauler(aux.get_x());
         int aux_y = getYTauler(aux.get_y());
         grid.add(imageChart,aux_x,aux_y);
-        
-        
         return grid;
     }
     
-
+    /** @brief Comprova si la posició passada per paràmetres és limit del Tauler
+	@pre --
+	@post Retorna cert si (x,y) és límit del Tauler de Joc */
     private boolean esLimit(int x, int y){
         boolean res = false;
         if(x == 0 || y == 0 || x == col-1 || y == row-1){
@@ -365,6 +342,9 @@ public class CarcassonneGUI extends Application {
         return res;
     }
     
+    /** @brief Inicialitza un GridPane buit
+	@pre --
+	@post Retorna un gridPane de mida (x,y) */
     private GridPane gridPaneBuit(int x, int y){
         //CREEM UN GRID PANE DE (x,y) I L'OMPLIM, A TOTES LES POSICIONS, AMB LA IMATGE QUE SIMBOLITZA "CASELLA BUIDA"
         GridPane res = new GridPane();
@@ -386,7 +366,10 @@ public class CarcassonneGUI extends Application {
         return res;
     }
     
-    private void resizeTauler(int x, int y){
+    /** @brief Actualitza el tauler de Joc
+	@pre --
+	@post Tauler de Joc actualitzat. Si x,y és límit, s'amplia el Tauler */
+    private void refreshTauler(int x, int y){
         //MIREM QUINA VARIABLE HEM D'INCREMENTAR
         if(x == 0 && y == 0 || x == 0 && y == row-1 || y == 0 && x == col-1 || x == col-1 && y == row-1){
             row++;
@@ -412,29 +395,39 @@ public class CarcassonneGUI extends Application {
         int seguidor = -1;
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            Peça aux =(Peça) pair.getValue();
+            Peça p =(Peça) pair.getValue();
+            
+            //DETECTEM SI LA PEÇA TE SEGUIDOR I ON
             teSeguidor = false;
             seguidor = -1;
             int i;
             for(i = 0; i <= 4 ; i++){
-                if(aux.getRegio(i-1)!=null){
-                    if(aux.getRegio(i-1).hiHaSeguidor()){
+                if(p.getRegio(i-1)!=null){
+                    if(p.getRegio(i-1).hiHaSeguidor()){
                         teSeguidor = true;
                         seguidor = i;
                     }
                 }
             }
-            ImageView aux2 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + aux.get_codi() + ".png")));
-            aux2.setRotate(aux.getIndexRotacio()*90);
-            int aux_x = getXTauler(aux.get_x());
-            int aux_y = getYTauler(aux.get_y());
-            ajustarImageView(aux2);
+            
+            //CARREGUEM LA IMATGE DE LA CASELLA
+            ImageView imatgePeça = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + p.get_codi() + ".png")));
+            imatgePeça.setRotate(p.getIndexRotacio()*90);
+            ajustarImageView(imatgePeça);
+
+            //AFEGIM LA IMATGE A UN STACK PANE
             StackPane casella = new StackPane();
-            casella.getChildren().add(aux2);
+            casella.getChildren().add(imatgePeça);
+            
+            //SI LA PEÇA TE SEGUIDOR, CRIDEM EL METODE PER AFEGIR-LO A L'STACK PANE ON ACABEM D'AFEGIR LA IMATGE DE LA PEÇA
             if(teSeguidor){
-                Jugador jug = aux.getRegio(seguidor-1).getJugador();
+                Jugador jug = p.getRegio(seguidor-1).getJugador();
                 afegirSeguidorStack(seguidor, casella,jug);
             }
+            
+            //AFEGIM LA PEÇA AL TAULER
+            int aux_x = getXTauler(p.get_x());
+            int aux_y = getYTauler(p.get_y());
             nouGrid.add(casella,aux_x,aux_y);
         }
         //ACTUALITZEM EL CENTRE DEL BORDER PANE AMB EL NOSTRE TAULER NOU I CRIDEM ELS EVENT LISTENERS PERQUÈ SE LI APLIQUIN
@@ -442,6 +435,9 @@ public class CarcassonneGUI extends Application {
         assignarEventListeners();
     }
     
+    /** @brief Comprova si la Peça pot anar en aquesta posició del Tauler
+	@pre --
+	@post Retorna cert si la Peça pot anar a la posició (x,y) del tauler */
     private boolean adjacenciesValides(int x, int y){ //X i Y del gridPane
         boolean compatible = false;
 	boolean valid = true;
@@ -482,26 +478,41 @@ public class CarcassonneGUI extends Application {
         return compatible;
     }
     
+    /** @brief Transforma la X del map del Tauler de Joc equivalent a la X del map de Joc
+	@pre --
+	@post Retorna la X del map del Tauler de Joc transformada a X del Tauler*/
     private int getXTauler(int xHash){
         int res = xHash - _joc.getTaulaJoc().getMinX() + 1;
         return res;
     }
     
+    /** @brief Transforma la Y del map del Tauler de Joc equivalent a la Y del map de Joc
+	@pre --
+	@post Retorna la Y del map del Tauler de Joc transformada a Y del Tauler*/
     private int getYTauler(int yHash){
         int res = (yHash*(-1)) + _joc.getTaulaJoc().getMaxY() + 1;
         return res;
     }
     
+    /** @brief Transforma la X del tauler equivalent a la X del map del Tauler de Joc
+	@pre --
+	@post Retorna la X del Tauler transformada a X del map del Tauler de Joc */
     private int getXHash(int x){
         int res = x + _joc.getTaulaJoc().getMinX() - 1;
         return res;                      
     }
     
+    /** @brief Transforma la Y del tauler equivalent a la Y del map del Tauler de Joc
+	@pre --
+	@post Retorna la Y del Tauler transformada a Y del map del Tauler de Joc */
     private int getYHash(int y){
         int res = (y - _joc.getTaulaJoc().getMaxY() - 1)/(-1);
         return res;
     }
     
+    /** @brief Assigna les funcions que fan tots els components de la GUI
+	@pre --
+	@post Components amb EventListeners inicialitzats*/
     private void assignarEventListeners(){
         pila.setOnDragDone(new EventHandler<DragEvent>() {
         public void handle(DragEvent event) {
@@ -513,20 +524,14 @@ public class CarcassonneGUI extends Application {
             @Override public void handle(ActionEvent e) {  
                 if(_joc.jugadorN(_joc.getTorn()).getSeguidors()>0){
                     List<Integer> aux = _joc.getTaulaJoc().seguidorsValids(lastxHash, lastyHash, _joc.jugadorN(_joc.getTorn()));
-                    for(int i = 0; i <= 4; i++){
-                        if(aux.get(i) == 1){
-                            mostrarBotons(10+i);
-                        }
-                    }
-                }
-                
-                //mostrarBotons(3);       
+                    mostrarBotonsSeguidor(aux);
+                }      
             }
         });
         
         acabar_torn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                amagarBotons(1);
+                refreshBotons(new int[]{0,0,1,1,1,1,1,1,1},false);
                 if(!_joc.getPila().isEmpty()){
                     pila.setVisible(true);
                     Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
@@ -543,18 +548,20 @@ public class CarcassonneGUI extends Application {
                     _primaryStage.setScene(escena);
                     _primaryStage.show();
                 }
-                mostrarBotons(1);
                 
-                
+                numPila.setVisible(true);
+                refreshBotons(new int[]{1,1,0,0,0,0,0,0,0},true);
+              
                 if(lastPos != null){
                     inserirSeguidor();
                 }
-                //actualitzarPuntuacio(_joc.getTorn(),_joc.jugadorN(_joc.getTorn()).getPunts());
                 lastPos = null;
-                actualitzarSeguidors(_joc.getTorn());
+                
                 _joc.passarTorn();
                 actualitzarTornJugador();
                 _joc.jugar();
+                actualitzarSeguidors();
+                refreshTauler(1,1);
                 for(int i=0;i < _joc.getnJugadors();i++){
                     actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
                 }
@@ -710,10 +717,13 @@ public class CarcassonneGUI extends Application {
                                 Peça p = _joc.popPila();
                                 _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
                                 if(esLimit(x,y)){
-                                    resizeTauler(x,y);
+                                    refreshTauler(x,y);
                                 }
-                                amagarBotons(2);
-                                mostrarBotons(2);
+                                pila.setVisible(false);
+                                numPila.setVisible(false);
+                                refreshBotons(new int[]{1,1,0,0,0,0,0,0,0},false);
+                                refreshBotons(new int[]{0,0,1,1,0,0,0,0,0},true);
+
                             }
                             else{
                                 Image aux1 = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/RES.png"));
@@ -737,6 +747,9 @@ public class CarcassonneGUI extends Application {
         
     }
     
+    /** @brief Ajusta l'ImageView a la mida corresponent
+	@pre --
+	@post ImageView ajustat segons les columnes i files del Tauler*/
     private void ajustarImageView(ImageView iv){
         if(row >= col){
             iv.setFitHeight(numAux/row);
@@ -748,6 +761,9 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Ajusta l'ImageView a la mida corresponent
+	@pre --
+	@post ImageView ajustat segons les columnes i files del Tauler*/
     private void ajustarSeguidor(ImageView iv){
         if(row >= col){
             iv.setFitHeight((numAux/row)/3.5);
@@ -759,120 +775,83 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Afegeix la imatge d'un seguidor a una casella
+	@pre --
+	@post Afegeix un seguidor a la posicio value de l'ultima peça inserida*/
     private void afegirSeguidor(Pos value){
-        ImageView aux1 = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
-        ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
-        ajustarImageView(aux1);
-        ajustarSeguidor(aux);
-        aux1.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);
+        ImageView imatgePeça = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
+        ImageView imatgeSeguidor = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
+        ajustarImageView(imatgePeça);
+        ajustarSeguidor(imatgeSeguidor);
+        imatgePeça.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);
         StackPane sp = new StackPane();
-        sp.getChildren().add(aux1);
-        sp.getChildren().add(aux);
-        StackPane.setAlignment(aux,value);
+        sp.getChildren().add(imatgePeça);
+        sp.getChildren().add(imatgeSeguidor);
+        StackPane.setAlignment(imatgeSeguidor,value);
         int x = getXTauler(lastxHash);
         int y = getYTauler(lastyHash);
         taul.add(sp,x,y);
+        
+        //GUARDEM LA POSICIO ON S'HA INSERIT
         lastPos = value;
     }
     
-    private void amagarBotons(int n){
-        if(n == 1){
-            top.setVisible(false);
-            bot.setVisible(false);
-            center.setVisible(false);
-            left.setVisible(false);
-            right.setVisible(false);
-            acabar_torn.setVisible(false);
-            afegirSeguidor.setVisible(false);
-        }
-        else if(n == 2){
-            pila.setVisible(false);
-            passa.setVisible(false);
-            rota.setVisible(false);
-            numPila.setVisible(false); 
+    /** @brief Mostra certs botons del Joc
+	@pre --
+	@post es mostren certs botons del Joc*/
+    public void refreshBotons(int[] aux,boolean mostrar){
+        Button[] buttons = new Button[]{passa,rota,afegirSeguidor,acabar_torn,center,top,right,bot,left};
+        for(int i = 0;i < aux.length; i++){
+            if(aux[i] == 1){
+                buttons[i].setVisible(mostrar);
+            }
         }
     }
     
-    private void mostrarBotons(int n){
-        if(n == 1){
-            passa.setVisible(true);
-            rota.setVisible(true);
-            numPila.setVisible(true);
-        }
-        else if(n == 2){
-            afegirSeguidor.setVisible(true);
-            acabar_torn.setVisible(true);
-        }
-        else if(n == 3){
-            top.setVisible(true);
-            bot.setVisible(true);
-            center.setVisible(true);
-            left.setVisible(true);
-            right.setVisible(true);
-        }
-        else if(n == 10){
-            center.setVisible(true);
-        }
-        else if(n == 11){
-            top.setVisible(true);
-        }
-        else if(n == 12){
-            right.setVisible(true);
-        }
-        else if(n == 13){
-            bot.setVisible(true);
-        }
-        else if(n == 14){
-            left.setVisible(true);
+    /** @brief Mostra els botons per afegir seguidor
+	@pre --
+	@post es mostren els botons indicats per afegir seguidor*/
+    public void mostrarBotonsSeguidor(List<Integer> aux){
+        Button[] buttons = new Button[]{center,top,right,bot,left};
+        for(int i = 0;i < 5; i++){
+            if(aux.get(i) == 1){
+                buttons[i].setVisible(true);
+            }
         }
     }
     
+    /** @brief S'actualitzen les puntuacions dels jugadors
+	@pre --
+	@post puntuacions actualitzades*/
     public void actualitzarPuntuacio(int nJugador, int puntuacio){
-            //EFECTES DE TEXT        
-            DropShadow ds = new DropShadow();
-            ds.setOffsetY(3.0f);
-            ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-            ///
             String aux = String.valueOf(puntuacio);
             Text category = new Text(aux);
-            category.setEffect(ds);
-            category.setCache(true);
-            category.setFill(Color.WHITE);
-            category.setFont(Font.font(null, FontWeight.BOLD, 22));
+            aplicarStyleText(category,Color.WHITE,22);
             esquerra.getChildren().remove(getNodeFromGridPane(esquerra,1,nJugador+1));
             esquerra.add(category, 1, nJugador+1);
     }
     
-    public void actualitzarSeguidors(int nJugador){
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
-        String aux1 = String.valueOf(_joc.jugadorN(nJugador).getSeguidors());
-        System.out.println("AAAAAAAAAAAAAAA     "+_joc.jugadorN(nJugador).getSeguidors());
-        String aux = "(x"+aux1+")";
-        Text category = new Text(aux);
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.WHITE);
-        category.setFont(Font.font(null, FontWeight.BOLD, 22));
-        esquerra.getChildren().remove(getNodeFromGridPane(esquerra,3,nJugador+1));
-        esquerra.add(category, 3, nJugador+1);
+    /** @brief S'actualitzen els seguidors de cada Jugador
+	@pre --
+	@post seguidors actualitzats*/
+    public void actualitzarSeguidors(){        
+        for(int i = 0; i < numJug; i++){
+            String aux1 = String.valueOf(_joc.jugadorN(i).getSeguidors());
+            String aux = "(x"+aux1+")";
+            Text category = new Text(aux);
+            aplicarStyleText(category,Color.WHITE,22);
+            esquerra.getChildren().remove(getNodeFromGridPane(esquerra,3,i+1));
+            esquerra.add(category, 3, i+1);
+        }     
     }
     
+    /** @brief Actualitza el jugador que està jugant en el torn actual
+	@pre --
+	@post Jugador que està jugant, actualitzat*/
     public void actualitzarTornJugador(){
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
         String aux = String.valueOf(_joc.getTorn()+1);
         Text category = new Text("JUGADOR "+aux);
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.WHITE);
-        category.setFont(Font.font(null, FontWeight.BOLD, 22));
+        aplicarStyleText(category,Color.WHITE,22);
         dreta.getChildren().remove(getNodeFromGridPane(dreta,1,0));
         dreta.add(category, 1, 0);
     }
@@ -895,52 +874,41 @@ public class CarcassonneGUI extends Application {
         }
     }
     
+    /** @brief Afegeix la imatge d'un seguidor en una Peça
+	@pre --
+	@post S'ha afegit la imatge d'un seguidor a la posició indicada a l'StackPane passat per paràmetres*/
     private void afegirSeguidorStack(int pos, StackPane sp,Jugador jug){
+        Pos[] posicions = new Pos[]{Pos.CENTER,Pos.TOP_CENTER,Pos.CENTER_RIGHT,Pos.BOTTOM_CENTER,Pos.CENTER_LEFT};
         ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+jug.getId()+".png")));
-        //ImageView aux = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/seguidors/"+_joc.getTorn()+".png")));
         ajustarSeguidor(aux);
         sp.getChildren().add(aux);
-        Pos value = null;
-        if(pos == 0) value = Pos.CENTER;
-        else if(pos == 1) value = Pos.TOP_CENTER;
-        else if(pos == 2) value = Pos.CENTER_RIGHT;
-        else if(pos == 3) value = Pos.BOTTOM_CENTER;
-        else if(pos == 4) value = Pos.CENTER_LEFT;
+        Pos value = posicions[pos];
         StackPane.setAlignment(aux,value);
     }
     
+    /** @brief Retorna el nº de Jugadors del Joc
+	@pre --
+	@post retorna numJug*/
     public int getNumJug(){
         return numJug;
     }
     
-    public Scene acabarJoc(){
-        //EFECTES DE TEXT        
-        DropShadow ds = new DropShadow();
-        ds.setOffsetY(3.0f);
-        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
-        ///
-        
+    /** @brief Retorna la pantalla final amb les puntuacions dels jugadors i el guanyador
+	@pre --
+	@post retorna la pantalla final del Joc*/
+    public Scene acabarJoc(){        
         GridPane root0 = new GridPane();
         root0.setHgap(20);
         root0.setVgap(40);
+        
         Scene scene = new Scene(root0, 800, 449);
-        //Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper1.jpg"));
         BackgroundSize bSize = new BackgroundSize(root0.getWidth(), root0.getHeight(), false, false, true, false);
-        /*root0.setBackground(new Background(new BackgroundImage(image2,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                bSize)));*/
+
         Text category = new Text("JUGADOR");
-        Text category1 = new Text("PUNTS");
-        category.setEffect(ds);
-        category.setCache(true);
-        category.setFill(Color.BLUE);
-        category.setFont(Font.font(null, FontWeight.BOLD, 20));
-        category1.setEffect(ds);
-        category1.setCache(true);
-        category1.setFill(Color.BLUE);
-        category1.setFont(Font.font(null, FontWeight.BOLD, 20));
+        Text category1 = new Text("PUNTS");      
+        aplicarStyleText(category,Color.BLUE,20);
+        aplicarStyleText(category1,Color.BLUE,20);
+
         root0.add(category, 0,0);
         root0.add(category1,1,0);
         //Obtenir jugadors en una array ordenats per puntuacio
@@ -948,31 +916,38 @@ public class CarcassonneGUI extends Application {
         for(int i=0; i<jug.size();i++){
             Text t = new Text("JUGADOR "+jug.get(i).getId());
             Text t1 = new Text(String.valueOf(jug.get(i).getPunts()));
-            ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + jug.get(i).getId() + ".png")));
-            t.setEffect(ds);
-            t.setCache(true);
-            t.setFill(Color.BLUE);
-            t.setFont(Font.font(null, FontWeight.BOLD, 20));
-            t1.setEffect(ds);
-            t1.setCache(true);
-            t1.setFill(Color.BLUE);
-            t1.setFont(Font.font(null, FontWeight.BOLD, 20));
+            ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + jug.get(i).getId() + ".png")));          
+            aplicarStyleText(t,Color.BLUE,20);
+            aplicarStyleText(t1,Color.BLUE,20);
             iv.setFitHeight(30);
             iv.setFitWidth(25);
+            
             root0.add(t,0,i+1);
             root0.add(t1,1,i+1);
             root0.add(iv,2,i+1);
         }
-        
-        
-        
+  
         root0.setAlignment(Pos.CENTER);
         return scene;
     }
     
-    /**
-     * @param args the command line arguments
-     */
+    /** @brief Aplica un estil al Text
+	@pre --
+	@post estil aplicat al Text passat per paràmetres*/
+    public void aplicarStyleText(Text t,Color c,int size){
+            //EFECTES DE TEXT        
+            DropShadow ds = new DropShadow();
+            ds.setOffsetY(3.0f);
+            ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+            ///
+            t.setEffect(ds);
+            t.setCache(true);
+            t.setFill(c);
+            t.setFont(Font.font(null, FontWeight.BOLD, size));
+    }
+
+    /** @brief Main de l'aplicació
+        @param args the command line arguments*/
     public static void main(String[] args) {
         launch(args);
     }
