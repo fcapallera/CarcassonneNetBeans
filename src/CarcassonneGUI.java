@@ -25,11 +25,13 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -58,6 +60,7 @@ public class CarcassonneGUI extends Application {
     private Button rota;///< Botó per rotar 90º la peça
     private Button passa;///< Botó per passar de carta
     private Button afegirSeguidor;///< Botó per desplegar les opcions per posar Seguidor
+    private Button eliminarSeg;
     private Button top;///< Botó per posar un seguidor a Nort de la Peça
     private Button bot;///< Botó per posar un seguidor a Sud de la Peça
     private Button left;///< Botó per posar un seguidor a Oest de la Peça
@@ -86,6 +89,7 @@ public class CarcassonneGUI extends Application {
     private int lastxHashSeguidor;
     private int lastyHashSeguidor;
     private Pos lastPos;
+    boolean shaJugat = false;
     
     
     /** @brief Inicia els components de la GUI
@@ -263,6 +267,10 @@ public class CarcassonneGUI extends Application {
         afegirSeguidor.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/afegirSeguidor.png"))));
         afegirSeguidor.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
         
+        eliminarSeg = new Button();
+        eliminarSeg.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/eliminarSeg.png"))));
+        eliminarSeg.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
+        
         top = new Button();
         top.setGraphic(new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("images/top.png"))));
         top.setStyle("-fx-focus-color: transparent;-fx-background-color: transparent;");
@@ -299,9 +307,10 @@ public class CarcassonneGUI extends Application {
         grid.add(numPila,1,1);
         grid.add(pila, 1, 2);
         grid.add(rota,1,3);
-        grid.add(passa,1,4);
+        //grid.add(passa,1,4);
         grid.add(afegirSeguidor,1,5);
-        grid.add(acabar_torn,2,5);
+        grid.add(acabar_torn,1,4);
+        grid.add(eliminarSeg,2,5);
         grid.add(top,1,6);
         grid.add(center,1,7);
         grid.add(left,0,7);
@@ -309,7 +318,7 @@ public class CarcassonneGUI extends Application {
         grid.add(bot,1,8);
         grid.setAlignment(Pos.CENTER);
         
-        refreshBotons(new int[]{0,0,1,1,1,1,1,1,1},false);
+        refreshBotons(new int[]{0,0,1,0,1,1,1,1,1,1},false);
 
         return grid;
     }
@@ -531,7 +540,7 @@ public class CarcassonneGUI extends Application {
         
         acabar_torn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                refreshBotons(new int[]{0,0,1,1,1,1,1,1,1},false);
+                refreshBotons(new int[]{0,0,1,0,1,1,1,1,1,1},false);
                 if(!_joc.getPila().isEmpty()){
                     pila.setVisible(true);
                     Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
@@ -548,15 +557,15 @@ public class CarcassonneGUI extends Application {
                     _primaryStage.setScene(escena);
                     _primaryStage.show();
                 }
-                
+
                 numPila.setVisible(true);
-                refreshBotons(new int[]{1,1,0,0,0,0,0,0,0},true);
-              
+                refreshBotons(new int[]{1,1,0,1,0,0,0,0,0,0},true);
+
                 if(lastPos != null){
                     inserirSeguidor();
                 }
                 lastPos = null;
-                
+
                 _joc.passarTorn();
                 actualitzarTornJugador();
                 _joc.jugar();
@@ -565,6 +574,25 @@ public class CarcassonneGUI extends Application {
                 for(int i=0;i < _joc.getnJugadors();i++){
                     actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
                 }
+                if(!shaJugat){
+                    _joc.popPila();
+                    if(!_joc.getPila().isEmpty()){
+                        Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                        pila.setImage(aux);
+                        pila.setRotate(0);
+                        numPila.setText(String.valueOf(_joc.getPila().size()));
+                    }
+                    else{
+                        pila.setVisible(false);
+                        numPila.setText(String.valueOf(_joc.getPila().size()));
+                        passa.setVisible(false);
+                        rota.setVisible(false);
+                        escena = acabarJoc();
+                        _primaryStage.setScene(escena);
+                        _primaryStage.show();
+                    }
+                }
+                shaJugat = false;
             }
         });
         
@@ -575,25 +603,9 @@ public class CarcassonneGUI extends Application {
             }
         });
         
-        passa.setOnAction(new EventHandler<ActionEvent>() {
+        eliminarSeg.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-                _joc.popPila();
-                if(!_joc.getPila().isEmpty()){
-                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
-                    pila.setImage(aux);
-                    pila.setRotate(0);
-                    numPila.setText(String.valueOf(_joc.getPila().size()));
-                }
-                else{
-                    pila.setVisible(false);
-                    numPila.setText(String.valueOf(_joc.getPila().size()));
-                    passa.setVisible(false);
-                    rota.setVisible(false);
-                    escena = acabarJoc();
-                    _primaryStage.setScene(escena);
-                    _primaryStage.show();
-                }
-                
+                eliminarSeguidor();              
             }
         });
         
@@ -721,8 +733,9 @@ public class CarcassonneGUI extends Application {
                                 }
                                 pila.setVisible(false);
                                 numPila.setVisible(false);
-                                refreshBotons(new int[]{1,1,0,0,0,0,0,0,0},false);
-                                refreshBotons(new int[]{0,0,1,1,0,0,0,0,0},true);
+                                shaJugat = true;
+                                refreshBotons(new int[]{1,1,0,0,0,0,0,0,0,0},false);
+                                refreshBotons(new int[]{0,0,1,1,0,0,0,0,0,0},true);
 
                             }
                             else{
@@ -796,11 +809,24 @@ public class CarcassonneGUI extends Application {
         lastPos = value;
     }
     
+    private void eliminarSeguidor(){
+        ImageView imatgePeça = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("/tiles/"+_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).get_codi()+".png")));
+        ajustarImageView(imatgePeça);
+        imatgePeça.setRotate(_joc.getTaulaJoc().getPeça(lastxHash, lastyHash).getIndexRotacio()*90);
+        StackPane sp = new StackPane();
+        sp.getChildren().add(imatgePeça);
+        int x = getXTauler(lastxHash);
+        int y = getYTauler(lastyHash);
+        taul.add(sp,x,y);
+        refreshTauler(1,1);
+        lastPos = null;
+    }
+    
     /** @brief Mostra certs botons del Joc
 	@pre --
 	@post es mostren certs botons del Joc*/
     public void refreshBotons(int[] aux,boolean mostrar){
-        Button[] buttons = new Button[]{passa,rota,afegirSeguidor,acabar_torn,center,top,right,bot,left};
+        Button[] buttons = new Button[]{passa,rota,afegirSeguidor,acabar_torn,center,top,right,bot,left,eliminarSeg};
         for(int i = 0;i < aux.length; i++){
             if(aux[i] == 1){
                 buttons[i].setVisible(mostrar);
@@ -816,6 +842,7 @@ public class CarcassonneGUI extends Application {
         for(int i = 0;i < 5; i++){
             if(aux.get(i) == 1){
                 buttons[i].setVisible(true);
+                eliminarSeg.setVisible(true);
             }
         }
     }
@@ -906,19 +933,20 @@ public class CarcassonneGUI extends Application {
 
         Text category = new Text("JUGADOR");
         Text category1 = new Text("PUNTS");      
-        aplicarStyleText(category,Color.BLUE,20);
-        aplicarStyleText(category1,Color.BLUE,20);
+        aplicarStyleText(category,Color.WHITE,24);
+        aplicarStyleText(category1,Color.WHITE,24);
 
         root0.add(category, 0,0);
         root0.add(category1,1,0);
         //Obtenir jugadors en una array ordenats per puntuacio
-        ArrayList<Jugador> jug = new ArrayList();//FCAP UN METODE QUE ELS RETORNI(?)
+        ArrayList<Jugador> jug = _joc.getJugadorsPuntuacio();
         for(int i=0; i<jug.size();i++){
-            Text t = new Text("JUGADOR "+jug.get(i).getId());
+            int numJug = jug.get(i).getId() + 1;
+            Text t = new Text("JUGADOR "+numJug);
             Text t1 = new Text(String.valueOf(jug.get(i).getPunts()));
             ImageView iv = new ImageView(new Image(CarcassonneGUI.class.getResourceAsStream("seguidors/" + jug.get(i).getId() + ".png")));          
-            aplicarStyleText(t,Color.BLUE,20);
-            aplicarStyleText(t1,Color.BLUE,20);
+            aplicarStyleText(t,Color.WHITE,20);
+            aplicarStyleText(t1,Color.WHITE,20);
             iv.setFitHeight(30);
             iv.setFitWidth(25);
             
@@ -926,7 +954,7 @@ public class CarcassonneGUI extends Application {
             root0.add(t1,1,i+1);
             root0.add(iv,2,i+1);
         }
-  
+        root0.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         root0.setAlignment(Pos.CENTER);
         return scene;
     }
