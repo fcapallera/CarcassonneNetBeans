@@ -155,6 +155,10 @@ public class Joc {
         _tauler.actualitzarPuntuacions();
     }
     
+    public void acabarPartida(){
+        _tauler.recompteFinal();
+    }
+    
     public void acabarTorn(){
         _gui.acabarTorn();
     }
@@ -174,6 +178,10 @@ public class Joc {
     
     public void passarTorn(){
         _torn = (_torn+1)%_jugadors.size();
+    }
+    
+    public CarcassonneGUI get_gui(){
+        return _gui;
     }
     
 }

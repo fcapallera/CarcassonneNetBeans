@@ -166,6 +166,8 @@ public class Jugador {
                         if(c.quiPuntua().contains(this)){
                             heuristica += c.puntuar();
                             if(c.get_pendents().contains(x*100+y) && c.get_pendents().size()==1) tornats += c.get_seguidors().get(this);
+                            if(peça.getRegio(i).get_codi()=='V') heuristica += (2 + 2*(adjacent.getRegio((i+2)%4).hiHaEscut() ? 1 : 0));
+                            else if(peça.getRegio(i).get_codi()=='C') heuristica += 1;
                         }
                         else if(c.ocupada())
                             heuristica -= c.puntuar()/2;

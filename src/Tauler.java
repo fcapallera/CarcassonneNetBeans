@@ -169,6 +169,20 @@ public class Tauler {
         }
     }
     
+    public void recompteFinal(){
+        Iterator it = _connexions.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            List<Construccio> llista = (List<Construccio>)pair.getValue();
+            for(Construccio c : llista){
+                List<Jugador> puntuadors = c.quiPuntua();
+                int punts = ((c instanceof Vila) ? c.puntuar()/2 : c.puntuar());
+                for(Jugador j : puntuadors) j.sumarPunts(punts);
+                c.tornarSeguidors();
+            }
+        }
+    }
+    
     public boolean seguidorValid(Peça peça, int posSeguidor, int x, int y, Jugador jugador){
         if(posSeguidor==-1) return false;
         else if(posSeguidor==0 && peça.centre()=='X') return false;

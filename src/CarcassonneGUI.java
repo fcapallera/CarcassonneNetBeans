@@ -89,7 +89,6 @@ public class CarcassonneGUI extends Application {
     private int lastxHashSeguidor;
     private int lastyHashSeguidor;
     private Pos lastPos;
-    boolean shaJugat = false;
     
     
     /** @brief Inicia els components de la GUI
@@ -488,9 +487,10 @@ public class CarcassonneGUI extends Application {
         acabar_torn.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 refreshBotons(new int[]{0,0,1,0,1,1,1,1,1,1},false);
+                
                 if(!_joc.getPila().isEmpty()){
                     pila.setVisible(true);
-                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                    Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.popPila().get_codi() + ".png"));
                     pila.setImage(aux);
                     pila.setRotate(_joc.peekPila().getIndexRotacio()*90);
                     numPila.setText(String.valueOf(_joc.getPila().size()));
@@ -648,12 +648,12 @@ public class CarcassonneGUI extends Application {
                                 lastxHash = xHash;
                                 lastyHash = yHash;
                                 success = true;
-                                Peça p = _joc.popPila();
+                                Peça p = _joc.peekPila();
+                                System.out.println("L'humà ha afegit: ("+xHash+","+yHash+")");
                                 _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
                                 refreshTauler(x,y);
                                 pila.setVisible(false);
                                 numPila.setVisible(false);
-                                shaJugat = true;
                                 refreshBotons(new int[]{1,1,0,0,0,0,0,0,0,0},false);
                                 refreshBotons(new int[]{0,0,1,1,0,0,0,0,0,0},true);
 
@@ -905,31 +905,29 @@ public class CarcassonneGUI extends Application {
         for(int i=0;i < _joc.getnJugadors();i++){
             actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
         }
-        if(!shaJugat){
-            _joc.popPila();
-            if(!_joc.getPila().isEmpty()){
-                Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
-                pila.setImage(aux);
-                pila.setRotate(0);
-                numPila.setText(String.valueOf(_joc.getPila().size()));
-            }
-            else{
-                pila.setVisible(false);
-                numPila.setText(String.valueOf(_joc.getPila().size()));
-                passa.setVisible(false);
-                rota.setVisible(false);
-                escena = acabarJoc();
-                _primaryStage.setScene(escena);
-                _primaryStage.show();
-            }
+        if(!_joc.getPila().empty()){
+            Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+            pila.setImage(aux);
+            pila.setRotate(0);
+            numPila.setText(String.valueOf(_joc.getPila().size()));
         }
-        shaJugat = false;
+        else{
+            _joc.acabarPartida();
+            pila.setVisible(false);
+            numPila.setText(String.valueOf(_joc.getPila().size()));
+            passa.setVisible(false);
+            rota.setVisible(false);
+            escena = acabarJoc();
+            _primaryStage.setScene(escena);
+            _primaryStage.show();
+        }
     }
+    
+
 
     /** @brief Main de l'aplicació
         @param args the command line arguments*/
     public static void main(String[] args) {
         launch(args);
     }
-    
 }
