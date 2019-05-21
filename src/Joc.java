@@ -40,7 +40,28 @@ public class Joc {
         
     }
     
-    
+    public ArrayList<Jugador> getJugadorsPuntuacio(){
+        ArrayList<Jugador> res = new ArrayList<Jugador>();
+        for(int i = 0; i < _jugadors.size();i++){
+            int j = 0;
+            boolean trobat = false;
+            while(!trobat && j < res.size()){
+                if(res.get(j).getPunts()>= _jugadors.get(i).getPunts()){
+                    j++;
+                }
+                else{
+                    trobat = true;
+                }
+            }
+            if(trobat){
+                res.add(j,_jugadors.get(i));
+            }
+            else{
+                res.add(res.size(),_jugadors.get(i));
+            }
+        }
+        return res;
+    }
 
     public void init(String arxiu, int nJ){
         File f = new File(PROVES_SRC+arxiu+".txt");
