@@ -88,7 +88,6 @@ public class Construccio {
         }
         _pendents.addAll(c.get_pendents());
         for(Regio r : _regions) _pendents.remove(r.get_peça().hashCode());
-        for(Integer i : _pendents) System.out.println(i);
     }
     
     /** @brief Afegeix una Regio a la Construccio

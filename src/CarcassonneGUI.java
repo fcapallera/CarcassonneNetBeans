@@ -433,48 +433,6 @@ public class CarcassonneGUI extends Application {
         assignarEventListeners();
     }
     
-    /** @brief Comprova si la Peça pot anar en aquesta posició del Tauler
-	@pre --
-	@post Retorna cert si la Peça pot anar a la posició (x,y) del tauler */
-    private boolean adjacenciesValides(int x, int y){ //X i Y del gridPane
-        boolean compatible = false;
-	boolean valid = true;
-	if(x != col-1){		
-            if(_joc.getTaulaJoc().getTauler().containsKey((x+1)*100+y)){
-                valid = false;
-                if(_joc.peekPila().getRegioAdjacent(1)/*EST*/ == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(3)/*OEST*/){
-                    valid = true;
-                }
-
-            }
-	}
-	if(x != 0){
-            if(_joc.getTaulaJoc().getTauler().containsKey((x-1)*100+y)){
-                valid = false;
-                if(_joc.peekPila().getRegioAdjacent(3) == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(1)){
-                    valid = true;
-                }
-            }
-	}
-	if(y != row-1){
-            if(_joc.getTaulaJoc().getTauler().containsKey(x*100+y+1)){
-                valid = false;
-                if(_joc.peekPila().getRegioAdjacent(2)/*SUD*/ == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(0)/*NORD*/){
-                    valid = true;
-                }
-            }
-	}
-	if(y != 0){
-            if(_joc.getTaulaJoc().getTauler().containsKey(x*100+y-1)){
-                valid = false;
-                if(_joc.peekPila().getRegioAdjacent(0) == _joc.getTaulaJoc().getTauler().get((x+1)*100+y).getRegioAdjacent(2)){
-                    valid = true;
-                }
-            }
-	}
-	compatible = valid;
-        return compatible;
-    }
     
     /** @brief Transforma la X del map del Tauler de Joc equivalent a la X del map de Joc
 	@pre --

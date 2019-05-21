@@ -126,16 +126,6 @@ public class Tauler {
     }
 
 
-    /*public Construccio buscarConstruccio(Regio regio){
-        int i = 0;
-        while(i<_connexions.get(regio.get_codi()+"").size()){
-            Construccio actual = _connexions.get(regio.get_codi()+"").get(i);
-            if(actual.conteRegio(regio)) return actual;
-            i++;
-        }
-        return null;
-    }*/
-
     public Peça getPeça(int x, int y){
         return _tauler.get(100*x+y);
     }
