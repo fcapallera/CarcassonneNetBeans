@@ -68,7 +68,6 @@ public class CarcassonneGUI extends Application {
     private Button center;///< Botó per posar un seguidor al Centre de la Peça
     private Button acabar_torn;///< Botó per passar torn
     private ImageView pila;///< ImageView on visualitzarem les Peces per posar al Tauler, fent un Drag&Drop
-    private int rotacioPila;///< nº de vegades que s'ha girat la Peça 90º
     private Text numPila;///< Text on visualitzarem el nº de cartes que queden a la pila 
     private Text tornJugador;///< Text on visualitzarem el Jugador que està jugant en el torn actual
     
@@ -77,7 +76,7 @@ public class CarcassonneGUI extends Application {
     private Button jugar;///< Botó de la pantalla per triar jugadors, per iniciar el Joc
     private TextField nJugadors;///< TextField on entrarem el nº de jugadors del Joc a la pantalla per triar jugadors
     
-    
+    private GeneradorJoc _generador;
     private Joc _joc;///< Joc al que jugarem i visualitzarem en aquesta GUI
     
     private int numJug;///< nº de jugadors del Joc
@@ -86,8 +85,6 @@ public class CarcassonneGUI extends Application {
     //unes quantes dades que es necessiten d'un Listener a un altre
     private int lastxHash;
     private int lastyHash;
-    private int lastxHashSeguidor;
-    private int lastyHashSeguidor;
     private Pos lastPos;
     
     
@@ -96,10 +93,11 @@ public class CarcassonneGUI extends Application {
 	@post Components de la GUI inicialitzats*/
     @Override
     public void start(Stage primaryStage) {
+        _generador = new GeneradorJoc("1");
+        
         _primaryStage = primaryStage;
         row = 3;
         col = 3;
-        rotacioPila = 0;
         numAux = 690;
         root = new BorderPane();
         Image image2 = new Image(CarcassonneGUI.class.getResourceAsStream("images/wallpaper.jpg"));
@@ -211,7 +209,7 @@ public class CarcassonneGUI extends Application {
         grid.add(category, 1, 0);
         
         for(int i = 0; i < 4; i++){
-            for(int j = 1; j <= numJug; j++){
+            for(int j = 1; j <= _joc.getnJugadors(); j++){
                 if(i == 0){
                     category = new Text("Jugador"+ j);
                     aplicarStyleText(category,Color.WHITE,22);
@@ -695,7 +693,7 @@ public class CarcassonneGUI extends Application {
     }
     
     private void inicialitzaJoc(){
-        _joc = new Joc("1",numJug,this);
+        _joc = _generador.generar(this);
     }
     
     /** @brief Ajusta l'ImageView a la mida corresponent
