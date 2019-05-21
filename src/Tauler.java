@@ -185,19 +185,19 @@ public class Tauler {
     
     public boolean seguidorValid(Peça peça, int posSeguidor, int x, int y, Jugador jugador){
         if(posSeguidor==-1) return false;
-        else if(peça.centre()=='X') return false;
+        else if(posSeguidor==0 && peça.centre()=='X') return false;
         else if(peça.getRegio(posSeguidor-1).get_codi()=='F') return false;
         else if(peça.getRegio(posSeguidor-1).get_codi()=='M') return true;
         else{
             int idRegio = peça.getRegio(posSeguidor-1).get_id();
-            int[] hashKeyAdj = {1,100,-1,-100};
             for(int i=0;i<4;i++){
-                if(i != (posSeguidor-1) && idRegio == peça.getRegio(i).get_id()){
+                if(idRegio == peça.getRegio(i).get_id()){
+                    int[] hashKeyAdj = {1,100,-1,-100};
                     Peça adjacent = _tauler.get(x*100+y+hashKeyAdj[i]);
                     if(adjacent!=null){
                         Regio adj = adjacent.getRegio((i+2)%4);
                         Construccio c = adj.get_pertany();
-                        if(!jugador.teConstruccio(c)) return false;
+                        if(c._ocupada) return false;
                     }
                 }
             }

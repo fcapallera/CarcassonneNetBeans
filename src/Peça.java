@@ -82,7 +82,7 @@ public class Peça implements Comparable<Peça>{
         this._codi = _codi;
     }
     
-    /** @brief Aplica una rotació de 90 graus a la Peça, canviant les seves Regions
+    /** @brief Aplica una rotació de -90 graus a la Peça, canviant les seves Regions
 	@pre --
 	@post _nRotacions++ i regions canviades girant 90º la peça */
     public void rotarClockWise(){

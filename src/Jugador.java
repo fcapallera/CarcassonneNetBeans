@@ -95,12 +95,11 @@ public class Jugador {
         for(Integer disponible : disponibles){
             Posicio actual = new Posicio(disponible);
             Tirada tirada;
-            
             for(int i=0;i<4;i++){
                 if(tauler.jugadaValida(peça, actual._x, actual._y)){
                     for(int j=-1;j<5;j++){
                         tirada = new Tirada(actual,i,j);
-                        if(j==-1 || tauler.seguidorValid(peça, i, actual._x, actual._y, this)){
+                        if(j==-1 || tauler.seguidorValid(peça, j, actual._x, actual._y, this)){
                             int heurActual = heuristica(tauler,tirada);
                             if(heurActual >= heurMillor){
                                 heurMillor = heurActual;
@@ -115,9 +114,10 @@ public class Jugador {
         peça.rotarFins(millor.rotacio);
         if(millor.posicio!=null){
             System.out.println("La gui ha tirat: ("+millor.posicio._x+","+millor.posicio._y+")");
+            joc.actualitzarTaulerGUI(millor.posicio._x, millor.posicio._y);
             tauler.afegirPeça(peça, millor.posicio._x, millor.posicio._y);
             if(millor.seguidor>-1) tauler.afegirSeguidor(millor.posicio._x, millor.posicio._y, millor.seguidor, this);
-            joc.actualitzarTaulerGUI(millor.posicio._x, millor.posicio._y);
+            
         }
     }
     

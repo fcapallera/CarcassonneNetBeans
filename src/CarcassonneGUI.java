@@ -331,17 +331,6 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
-    /** @brief Comprova si la posició passada per paràmetres és limit del Tauler
-	@pre --
-	@post Retorna cert si (x,y) és límit del Tauler de Joc */
-    private boolean esLimit(int x, int y){
-        boolean res = false;
-        if(x == 0 || y == 0 || x == col-1 || y == row-1){
-            res = true;
-        }
-        return res;
-    }
-    
     /** @brief Inicialitza un GridPane buit
 	@pre --
 	@post Retorna un gridPane de mida (x,y) */
@@ -716,9 +705,7 @@ public class CarcassonneGUI extends Application {
                                 success = true;
                                 Peça p = _joc.popPila();
                                 _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
-                                if(esLimit(x,y)){
-                                    refreshTauler(x,y);
-                                }
+                                refreshTauler(x,y);
                                 pila.setVisible(false);
                                 numPila.setVisible(false);
                                 refreshBotons(new int[]{1,1,0,0,0,0,0,0,0},false);

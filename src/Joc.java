@@ -135,7 +135,8 @@ public class Joc {
     }
     
     public void actualitzarTaulerGUI(int x, int y){
-        _gui.refreshTauler(_gui.getXTauler(x), _gui.getYTauler(y));
+        System.out.println("Tauler ("+_gui.getXTauler(x)+","+_gui.getYTauler(y)+")");
+         _gui.refreshTauler(_gui.getXTauler(x), _gui.getYTauler(y));
     }
     
     public int getnJugadors(){
