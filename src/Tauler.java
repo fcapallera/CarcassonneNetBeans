@@ -119,11 +119,7 @@ public class Tauler {
             if(regio==null || regio.get_codi()=='F') valids.add(0);
             else{
                 if(!regio.get_pertany().ocupada()) valids.add(1);
-                else{
-                    List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
-                    if(puntuadors.contains(actual)) valids.add(1);
-                    else valids.add(0);
-                }
+                else valids.add(0);
             }
         }
         return valids;

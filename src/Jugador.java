@@ -1,6 +1,7 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,18 @@ public class Jugador {
         _construccions.put("V",new ArrayList<>());
         _construccions.put("C",new ArrayList<>());
         _construccions.put("M", new ArrayList<>());
+    }
+    
+    
+    @Override
+    public boolean equals(Object other){
+        if(other == this) return true;
+        
+        if(!(other instanceof Jugador)) return false;
+        
+        Jugador j = (Jugador)other;
+        
+        return _id == j.getId();
     }
     
     /** @brief Posa l'atribut CPU a cert
@@ -100,7 +113,7 @@ public class Jugador {
                     for(int j=-1;j<5;j++){
                         tirada = new Tirada(actual,i,j);
                         if(j==-1 || tauler.seguidorValid(peça, j, actual._x, actual._y, this)){
-                            int heurActual = heuristica(tauler,tirada);
+                            int heurActual = heuristica(tauler,tirada,peça);
                             if(heurActual >= heurMillor){
                                 heurMillor = heurActual;
                                 millor = new Tirada(tirada);
@@ -113,7 +126,7 @@ public class Jugador {
         }
         peça.rotarFins(millor.rotacio);
         if(millor.posicio!=null){
-            System.out.println("La gui ha tirat: ("+millor.posicio._x+","+millor.posicio._y+")");
+            System.out.println("La gui ha tirat: ("+millor.posicio._x+","+millor.posicio._y+") amb heuristica: "+heurMillor);
             joc.actualitzarTaulerGUI(millor.posicio._x, millor.posicio._y);
             tauler.afegirPeça(peça, millor.posicio._x, millor.posicio._y);
             if(millor.seguidor>-1) tauler.afegirSeguidor(millor.posicio._x, millor.posicio._y, millor.seguidor, this);
@@ -122,12 +135,89 @@ public class Jugador {
     }
     
     
-    private int heuristica(Tauler tauler, Tirada tirada){
-        int heuristica = 10;
+    private int heuristica(Tauler tauler, Tirada tirada, Peça peça){
+        int heuristica = 0;
+        int heuristicaSeguidors = 0;
+        int x = tirada.posicio._x;
+        int y = tirada.posicio._y;
+        int seguidor = tirada.seguidor;
+        int[] hashKeyAdj = {1,100,-1,-100};
+        int tornats = 0;
         
         //1. Calculem l'heurística sense tenir en compte si afegim seguidor
         
-        return heuristica;
+        //Completa un monestir
+        for(Construccio c : _construccions.get("M")){
+            Set<Integer> pendents = c.get_pendents();
+            if(pendents.contains(100*x+y)){
+                heuristica += 10 - pendents.size();
+                if(pendents.size()==1) tornats++;
+            }       
+        }
+        
+        //Expandeix construccions que són nostres
+        Set<Construccio> explorades = new HashSet<>();
+        for(int i=0;i<4;i++){
+            if(peça.getRegio(i).get_codi()!='F'){
+                Peça adjacent = tauler.getTauler().get(x*100+y+hashKeyAdj[i]);
+                if(adjacent!=null){
+                    Construccio c = adjacent.getRegio((i+2)%4).get_pertany();
+                    if(!explorades.contains(c)){
+                        if(c.quiPuntua().contains(this)){
+                            heuristica += c.puntuar();
+                            if(c.get_pendents().contains(x*100+y) && c.get_pendents().size()==1) tornats += c.get_seguidors().get(this);
+                        }
+                        else if(c.ocupada())
+                            heuristica -= c.puntuar()/2;
+                        explorades.add(c);
+                    }
+                }
+            }
+        }
+        //Ara comprovarem si afegint un seguidor tenim benefici extra
+        if(seguidor!=-1){
+            if(_seguidors == 1 && tornats == 0) heuristicaSeguidors -= 100;
+            else{
+                //Vol colocar un monestir
+                if(seguidor==0 && peça.getRegio(-1).get_codi()=='M'){
+                    heuristicaSeguidors += 3;
+                    int[] hashKeyMonestir = {100,101,1,-99,-100,-101,-1,99};
+                    for(int p : hashKeyMonestir){
+                        if(tauler.getTauler().containsKey(x*100+y+p)) heuristicaSeguidors++;
+                    }
+                }
+                
+                Regio triada = peça.getRegio(seguidor-1);
+                explorades = new HashSet<>();
+                boolean comprovada = false;
+                for(int i=0;i<4;i++){
+                    if(triada.equals(peça.getRegio(i))){
+                        Peça adjacent = tauler.getTauler().get(x*100+y+hashKeyAdj[i]);
+                        if(adjacent!=null){
+                            Construccio c = adjacent.getRegio((i+2)%4).get_pertany();
+                            if(!explorades.contains(c)){
+                                if(!c._ocupada){
+                                    heuristicaSeguidors += c.puntuar();
+                                    if(c.get_pendents().size()==1) heuristicaSeguidors += 3;
+                                }
+                            }
+                        }
+                        else{
+                            if(!(_seguidors < 3 && tornats == 0) && !comprovada){
+                                comprovada = true;
+                                if(peça.getRegio(i).get_codi()=='V') heuristicaSeguidors += (2 + 2*(triada.hiHaEscut() ? 1 : 0));
+                                else if(peça.getRegio(i).get_codi()=='C') heuristicaSeguidors += 1;
+                            }
+                        }
+
+                    }
+                }
+            }
+            if(heuristicaSeguidors == 0) heuristica -= 10;
+        }
+        
+        
+        return heuristica + (heuristicaSeguidors-1) + tornats * 3;
     }
     
     public boolean teConstruccio(Construccio c){

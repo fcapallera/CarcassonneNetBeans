@@ -329,4 +329,5 @@ public class Peça implements Comparable<Peça>{
     public int getIndexRotacio(){
         return _nRotacions;
     }
+    
 }

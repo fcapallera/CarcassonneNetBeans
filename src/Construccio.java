@@ -19,7 +19,7 @@ public class Construccio {
 	@post  */
     public Construccio(Regio regio){
         addRegio(regio);
-        regio.set_pertany(this);    
+        regio.set_pertany(this);
     }
     
     @Override
