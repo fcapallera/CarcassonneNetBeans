@@ -128,7 +128,7 @@ public class CarcassonneGUI extends Application {
         jugar.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
                 numJug = Integer.parseInt(nJugadors.getText());
-                _joc = new Joc("2",numJug);
+                inicialitzaJoc();
                 taul = getCenterGridPane();
                 dreta = getRightGridPane();
                 esquerra = getLeftGridPane();
@@ -340,17 +340,6 @@ public class CarcassonneGUI extends Application {
         return grid;
     }
     
-    /** @brief Comprova si la posició passada per paràmetres és limit del Tauler
-	@pre --
-	@post Retorna cert si (x,y) és límit del Tauler de Joc */
-    private boolean esLimit(int x, int y){
-        boolean res = false;
-        if(x == 0 || y == 0 || x == col-1 || y == row-1){
-            res = true;
-        }
-        return res;
-    }
-    
     /** @brief Inicialitza un GridPane buit
 	@pre --
 	@post Retorna un gridPane de mida (x,y) */
@@ -378,7 +367,7 @@ public class CarcassonneGUI extends Application {
     /** @brief Actualitza el tauler de Joc
 	@pre --
 	@post Tauler de Joc actualitzat. Si x,y és límit, s'amplia el Tauler */
-    private void refreshTauler(int x, int y){
+    public void refreshTauler(int x, int y){
         //MIREM QUINA VARIABLE HEM D'INCREMENTAR
         if(x == 0 && y == 0 || x == 0 && y == row-1 || y == 0 && x == col-1 || x == col-1 && y == row-1){
             row++;
@@ -490,7 +479,7 @@ public class CarcassonneGUI extends Application {
     /** @brief Transforma la X del map del Tauler de Joc equivalent a la X del map de Joc
 	@pre --
 	@post Retorna la X del map del Tauler de Joc transformada a X del Tauler*/
-    private int getXTauler(int xHash){
+    public int getXTauler(int xHash){
         int res = xHash - _joc.getTaulaJoc().getMinX() + 1;
         return res;
     }
@@ -498,7 +487,7 @@ public class CarcassonneGUI extends Application {
     /** @brief Transforma la Y del map del Tauler de Joc equivalent a la Y del map de Joc
 	@pre --
 	@post Retorna la Y del map del Tauler de Joc transformada a Y del Tauler*/
-    private int getYTauler(int yHash){
+    public int getYTauler(int yHash){
         int res = (yHash*(-1)) + _joc.getTaulaJoc().getMaxY() + 1;
         return res;
     }
@@ -728,9 +717,7 @@ public class CarcassonneGUI extends Application {
                                 success = true;
                                 Peça p = _joc.popPila();
                                 _joc.getTaulaJoc().afegirPeça(p, xHash, yHash);
-                                if(esLimit(x,y)){
-                                    refreshTauler(x,y);
-                                }
+                                refreshTauler(x,y);
                                 pila.setVisible(false);
                                 numPila.setVisible(false);
                                 shaJugat = true;
@@ -772,6 +759,10 @@ public class CarcassonneGUI extends Application {
             iv.setFitHeight(numAux/col);
             iv.setFitWidth(numAux/col);
         }
+    }
+    
+    private void inicialitzaJoc(){
+        _joc = new Joc("1",numJug,this);
     }
     
     /** @brief Ajusta l'ImageView a la mida corresponent

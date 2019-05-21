@@ -45,7 +45,8 @@ public class Tauler {
         
         List<Peça> adjacents = new ArrayList<>();
         int[] hashKeyAdj = {1,100,-1,-100};
-
+        
+        //Mirem les peces adjacents
         for(int i=0;i<4;i++){
             if(_tauler.containsKey(peça.hashCode()+hashKeyAdj[i])){
                 Peça adj = _tauler.get(peça.hashCode()+hashKeyAdj[i]);
@@ -55,7 +56,7 @@ public class Tauler {
         }
         peça.set_adjacents(adjacents);
         
-        //Comprovació de peça amb Monestir
+        //Mirem si al centre de la peça hi ha un monestir i el creem
         if(peça.centre()=='M'){
             Regio m = peça.getRegio(-1);
             Construccio c = new Monestir(m);
@@ -182,9 +183,35 @@ public class Tauler {
         }
     }
     
+    public boolean seguidorValid(Peça peça, int posSeguidor, int x, int y, Jugador jugador){
+        if(posSeguidor==-1) return false;
+        else if(posSeguidor==0 && peça.centre()=='X') return false;
+        else if(peça.getRegio(posSeguidor-1).get_codi()=='F') return false;
+        else if(peça.getRegio(posSeguidor-1).get_codi()=='M') return true;
+        else{
+            int idRegio = peça.getRegio(posSeguidor-1).get_id();
+            for(int i=0;i<4;i++){
+                if(idRegio == peça.getRegio(i).get_id()){
+                    int[] hashKeyAdj = {1,100,-1,-100};
+                    Peça adjacent = _tauler.get(x*100+y+hashKeyAdj[i]);
+                    if(adjacent!=null){
+                        Regio adj = adjacent.getRegio((i+2)%4);
+                        Construccio c = adj.get_pertany();
+                        if(c._ocupada) return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     private void actualitzarMonestirs(Peça peça){
         List<Construccio> monestirs = _connexions.get("M");
         for(Construccio m : monestirs) m.removePendent(peça.hashCode());
+    }
+    
+    public Set<Integer> get_disponibles(){
+        return _disponibles;
     }
 
 }

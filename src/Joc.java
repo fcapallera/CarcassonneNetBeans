@@ -27,13 +27,15 @@ public class Joc {
     private Tauler _tauler;
     private int _torn;
     private boolean _jugat;
+    private CarcassonneGUI _gui;
     
-    public Joc(String arxiu,int nJ){
+    public Joc(String arxiu,int nJ,CarcassonneGUI gui){
         _peces = new Stack<Peça>();
         _jugadors = new ArrayList<Jugador>();
         _tauler = new Tauler(false);
         _torn = 0;
         _jugat = false;
+        _gui = gui;
         this.init(arxiu,nJ);
         
     }
@@ -143,13 +145,19 @@ public class Joc {
     public void jugar(){
         //Avança un torn i deixa jugar al seguent jugador
         
-        if(_jugadors.get(_torn % _jugadors.size()).get_cpu()){
-            //Jugar la CPU
+        if(_jugadors.get(_torn).get_cpu()){
+            _jugadors.get(_torn).tirarCpu(_tauler,_peces.pop(),this);
+            passarTorn();
         }
         else{
             //Jugar amb jugador humà, ergo, no fer res.
         }
         _tauler.actualitzarPuntuacions();
+    }
+    
+    public void actualitzarTaulerGUI(int x, int y){
+        System.out.println("Tauler ("+_gui.getXTauler(x)+","+_gui.getYTauler(y)+")");
+         _gui.refreshTauler(_gui.getXTauler(x), _gui.getYTauler(y));
     }
     
     public int getnJugadors(){
@@ -161,7 +169,7 @@ public class Joc {
     }
     
     public void passarTorn(){
-        _torn++;
+        _torn = (_torn+1)%_jugadors.size();
     }
     
 }
