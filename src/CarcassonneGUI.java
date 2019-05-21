@@ -554,34 +554,9 @@ public class CarcassonneGUI extends Application {
                     inserirSeguidor();
                 }
                 lastPos = null;
-
                 _joc.passarTorn();
-                actualitzarTornJugador();
                 _joc.jugar();
-                actualitzarSeguidors();
-                refreshTauler(1,1);
-                for(int i=0;i < _joc.getnJugadors();i++){
-                    actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
-                }
-                if(!shaJugat){
-                    _joc.popPila();
-                    if(!_joc.getPila().isEmpty()){
-                        Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
-                        pila.setImage(aux);
-                        pila.setRotate(0);
-                        numPila.setText(String.valueOf(_joc.getPila().size()));
-                    }
-                    else{
-                        pila.setVisible(false);
-                        numPila.setText(String.valueOf(_joc.getPila().size()));
-                        passa.setVisible(false);
-                        rota.setVisible(false);
-                        escena = acabarJoc();
-                        _primaryStage.setScene(escena);
-                        _primaryStage.show();
-                    }
-                }
-                shaJugat = false;
+                acabarTorn();
             }
         });
         
@@ -963,6 +938,34 @@ public class CarcassonneGUI extends Application {
             t.setCache(true);
             t.setFill(c);
             t.setFont(Font.font(null, FontWeight.BOLD, size));
+    }
+    
+    public void acabarTorn(){
+        actualitzarTornJugador();
+        actualitzarSeguidors();
+        refreshTauler(1,1);
+        for(int i=0;i < _joc.getnJugadors();i++){
+            actualitzarPuntuacio(i,_joc.jugadorN(i).getPunts());
+        }
+        if(!shaJugat){
+            _joc.popPila();
+            if(!_joc.getPila().isEmpty()){
+                Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.peekPila().get_codi() + ".png"));
+                pila.setImage(aux);
+                pila.setRotate(0);
+                numPila.setText(String.valueOf(_joc.getPila().size()));
+            }
+            else{
+                pila.setVisible(false);
+                numPila.setText(String.valueOf(_joc.getPila().size()));
+                passa.setVisible(false);
+                rota.setVisible(false);
+                escena = acabarJoc();
+                _primaryStage.setScene(escena);
+                _primaryStage.show();
+            }
+        }
+        shaJugat = false;
     }
 
     /** @brief Main de l'aplicació

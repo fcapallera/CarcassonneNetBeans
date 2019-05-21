@@ -155,6 +155,10 @@ public class Joc {
         _tauler.actualitzarPuntuacions();
     }
     
+    public void acabarTorn(){
+        _gui.acabarTorn();
+    }
+    
     public void actualitzarTaulerGUI(int x, int y){
         System.out.println("Tauler ("+_gui.getXTauler(x)+","+_gui.getYTauler(y)+")");
          _gui.refreshTauler(_gui.getXTauler(x), _gui.getYTauler(y));

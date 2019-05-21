@@ -117,8 +117,8 @@ public class Jugador {
             joc.actualitzarTaulerGUI(millor.posicio._x, millor.posicio._y);
             tauler.afegirPeça(peça, millor.posicio._x, millor.posicio._y);
             if(millor.seguidor>-1) tauler.afegirSeguidor(millor.posicio._x, millor.posicio._y, millor.seguidor, this);
-            
         }
+        joc.acabarTorn();
     }
     
     
