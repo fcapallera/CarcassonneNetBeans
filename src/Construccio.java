@@ -19,7 +19,7 @@ public class Construccio {
 	@post  */
     public Construccio(Regio regio){
         addRegio(regio);
-        regio.set_pertany(this);    
+        regio.set_pertany(this);
     }
     
     @Override
@@ -87,8 +87,7 @@ public class Construccio {
             else _seguidors.put(clau,(Integer)pair.getValue());
         }
         _pendents.addAll(c.get_pendents());
-        for(Regio r : _regions) _pendents.remove(r.get_peça().hashCode());
-        for(Integer i : _pendents) System.out.println(i);
+        for(Regio r : _regions) _pendents.removeAll(Collections.singleton(r.get_peça().hashCode()));
     }
     
     /** @brief Afegeix una Regio a la Construccio

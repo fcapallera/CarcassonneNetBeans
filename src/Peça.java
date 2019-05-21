@@ -20,7 +20,6 @@ public class Peça implements Comparable<Peça>{
     private int _nRotacions = 0;///< Nombre de rotacions que se li ha donat a la peça en el moment de col·locar-la
     private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));///< Llista de Peces adjacents
     private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null,null));///< Llista de Regions de la Peça
-    final private Map<String,ArrayList<Integer>> _indexs = new HashMap<>();///<
     
     /** @brief Es sobreescriu el mètode compareTo que ens compara el hashCode de les Peces
 	@pre 
@@ -67,10 +66,6 @@ public class Peça implements Comparable<Peça>{
 	@post  */
     public Peça(String _codi) {
         this._codi = _codi;
-        //this.setGraphic(new ImageView(new Image("src/tiles/"+_codi+".png")));
-        _indexs.put("V", new ArrayList<>());
-        _indexs.put("C", new ArrayList<>());
-        _indexs.put("F", new ArrayList<>());
     }
     
     /** @brief 
@@ -205,13 +200,6 @@ public class Peça implements Comparable<Peça>{
         _adjacents.set(orientacio,peça);
     }
     
-    /** @brief 
-	@pre 
-	@post  */
-    public char getRegioAdjacent(int a){
-        if(a > 0 || a < 4) throw new IndexOutOfBoundsException("Index "+a+" is out of bounds");
-        else return _codi.charAt(a);
-    }
     
     /** @brief Mètode per comprovar si a la ciutat hi ha escut
 	@pre --
@@ -220,24 +208,6 @@ public class Peça implements Comparable<Peça>{
         return _codi.indexOf('E') > 0;
     }
     
-    /** @brief Retorna una llista amb els char de les regions de la Peça ordenats per {CNESW}
-	@pre --
-	@post Retorna una llista amb els char de cada Regio de la Peça */
-    public List<Integer> indexRegio(char regio){
-        List<Integer> retorn = new ArrayList<>();
-        for(int i=1;i<5;i++){
-            if(_codi.charAt(i)==regio) retorn.add(i);
-        }
-        return retorn;
-    }
-    
-    /** @brief 
-	@pre 
-	@post  */
-    public List<Peça> adjacenciesConnexes(char regio){
-        return _adjacents.stream()
-                .filter(p -> p != null && _codi.charAt(_adjacents.indexOf(p))==regio).collect(Collectors.toList());
-    }
     
     /** @brief Retorna el char de la Regio CENTRE
 	@pre --
@@ -264,13 +234,7 @@ public class Peça implements Comparable<Peça>{
     public void set_adjacents(List<Peça> _adjacents) {
         this._adjacents = _adjacents;
     }
-    
-    /** @brief 
-	@pre 
-	@post  */
-    public Map<String,ArrayList<Integer>> get_indexs(){
-        return _indexs;
-    }
+
     
     /** @brief Retorna el codi de la Peça
 	@pre --
@@ -293,14 +257,6 @@ public class Peça implements Comparable<Peça>{
         return _x;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
-    public void set_indexs(){
-        for(int i=1;i<5;i++){
-            _indexs.get(""+_regions.get(i).get_codi()).add(i-1);
-        }
-    }
     
     /** @brief Canvia la coordenada X de la Peça
 	@pre --
@@ -329,4 +285,5 @@ public class Peça implements Comparable<Peça>{
     public int getIndexRotacio(){
         return _nRotacions;
     }
+    
 }

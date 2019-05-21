@@ -119,26 +119,12 @@ public class Tauler {
             if(regio==null || regio.get_codi()=='F') valids.add(0);
             else{
                 if(!regio.get_pertany().ocupada()) valids.add(1);
-                else{
-                    List<Jugador> puntuadors = regio.get_pertany().quiPuntua();
-                    if(puntuadors.contains(actual)) valids.add(1);
-                    else valids.add(0);
-                }
+                else valids.add(0);
             }
         }
         return valids;
     }
 
-
-    /*public Construccio buscarConstruccio(Regio regio){
-        int i = 0;
-        while(i<_connexions.get(regio.get_codi()+"").size()){
-            Construccio actual = _connexions.get(regio.get_codi()+"").get(i);
-            if(actual.conteRegio(regio)) return actual;
-            i++;
-        }
-        return null;
-    }*/
 
     public Peça getPeça(int x, int y){
         return _tauler.get(100*x+y);
@@ -179,6 +165,20 @@ public class Tauler {
                     c.tornarSeguidors();
                     iter.remove();
                 }
+            }
+        }
+    }
+    
+    public void recompteFinal(){
+        Iterator it = _connexions.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair = (Map.Entry)it.next();
+            List<Construccio> llista = (List<Construccio>)pair.getValue();
+            for(Construccio c : llista){
+                List<Jugador> puntuadors = c.quiPuntua();
+                int punts = ((c instanceof Vila) ? c.puntuar()/2 : c.puntuar());
+                for(Jugador j : puntuadors) j.sumarPunts(punts);
+                c.tornarSeguidors();
             }
         }
     }
