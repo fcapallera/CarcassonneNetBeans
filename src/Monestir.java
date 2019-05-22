@@ -5,33 +5,28 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** @class Monestir
-    @brief 
-    @author 
+    @brief Construcció de tipus Monestir
+    @author Ferran Capallera
 */
 public class Monestir extends Construccio {
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Constructor de Monestir a partir d'una Regio.
+	@pre cert
+	@post Es crea un Monestir amb el _pendents no inicialitzat. */
     public Monestir(Regio regio) {
         super(regio);
-        Peça peça = regio.get_peça();
-        int[] hashKeyAdj = {100,101,1,-99,-100,-101,-1,99};
-        for(int i : hashKeyAdj){
-            _pendents.add(peça.hashCode()+i);
-        }
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Retorna la puntuació d'aquest Monestir.
+	@pre cert
+	@post Retorna 9 si el Monestir està complet. Altrament 9 - les peces incompletes. */
     @Override
     public int puntuar(){
         return 9 - _pendents.size();
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Inicialitza les peces pendents del monestir.
+	@pre El monestir s'acaba de crear.
+	@post Per cada peça adjacent {N,NE,E,SE,S,SW,W,NW} s'afageix a pendents si no hi és al tauler.  */
     public void setPendents(Tauler tauler, Peça peça){
         int[] hashKeyAdj = {100,101,1,-99,-100,-101,-1,99};
         Set<Integer> pendents = new HashSet<>();
