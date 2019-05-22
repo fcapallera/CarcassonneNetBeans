@@ -1,4 +1,6 @@
-
+/** @file GeneradorJoc.java
+    @brief Classe E/S que ens permet llegir d'un joc de proves (.txt) i generar un Joc.
+*/
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.Stack;
 
 /**
  *
- * @author usuario
+ * @author Adrià Orellana
  */
 public class GeneradorJoc {
     String _arxiu;
@@ -86,6 +88,7 @@ public class GeneradorJoc {
                     pecesJoc.push(p);
                 }
             }
+            //Barregem les peces aleatòriament
             Collections.shuffle(pecesJoc);
             joc.set_peces(pecesJoc);
         } else System.out.println("Error");

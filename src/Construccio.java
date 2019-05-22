@@ -5,14 +5,14 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /** @class Construccio
-    @brief Representació d'un conjunt de Regions on un Jugador pot posar seguidors. Quan es completa la Construcció, es retornen els seguidors i es puntua per el Jugador que els hi ha posat.
+    @brief Representació d'un conjunt de Regions que formen una construcció. Aquí controlarem quants seguidors hi ha de cada jugador, les peces que falten per completar-la.
     @author 
 */
 public abstract class Construccio {
-    protected Set<Regio> _regions = new HashSet<>();///< Set de Regions
-    protected Map<Jugador,Integer> _seguidors = new HashMap<>();///< Map on <Jugador , nº seguidors dintre la construcció>
-    protected Set<Integer> _pendents = new HashSet<>();///< Set de posicions (hash) que s'han de tapar per completar la construcció 
-    protected boolean _ocupada = false;///< Cert si la Construccio té algun seguidor
+    protected Set<Regio> _regions = new HashSet<>(); /**< Set de Regions */
+    protected Map<Jugador,Integer> _seguidors = new HashMap<>(); ///< Map on <Jugador , nº seguidors dintre la construcció>
+    protected Set<Integer> _pendents = new HashSet<>(); ///< Set de posicions (hash) que s'han de tapar per completar la construcció 
+    protected boolean _ocupada = false; ///< Cert si la Construccio té algun seguidor
     
     /** @invariant _ocupada == true <-> !_seguidors.isEmpty() */
     
@@ -115,16 +115,16 @@ public abstract class Construccio {
         jugador.addConstruccio(this);
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Afageix una posició (hash) a la llista de pendents.
+	@pre \p pendent != null
+	@post elements = elements+1 */
     public void addPendent(Integer pendent){
         _pendents.add(pendent);
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Elimina una posició (hash) de la llista de pendents.
+	@pre --
+	@post Si pendent existeix, elements = elements -1 */
     public void removePendent(Integer pendent){
         _pendents.remove(pendent);
     }
@@ -137,36 +137,36 @@ public abstract class Construccio {
     }
     
     /** @brief Retorna el Set de Regions
-	@pre 
-	@post  */
+	@pre --
+	@post Retorna el Set de Regions */
     public Set<Regio> get_regions() {
         return _regions;
     }
     
     /** @brief Retorna el Map que representa els Seguidors de la Construcció
-	@pre 
-	@post  */
+	@pre --
+	@post Retorna el Map que representa els Seguidors de la Construcció */
     public Map<Jugador, Integer> get_seguidors() {
         return _seguidors;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Retorna si la construcció està completada.
+	@pre cert
+	@post retorna _pendents.size()==0. */
     public boolean completada(){
         return _pendents.size() == 0;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Retorna el set de pendents.
+	@pre cert
+	@post Retorna el set de pendents. */
     public Set<Integer> get_pendents(){
         return _pendents;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Assigna un valor al Set de pendents.
+	@pre cert
+	@post _pendents = \p pendents. */
     public void set_pendents(Set<Integer> pendents){
         _pendents = pendents;
     }

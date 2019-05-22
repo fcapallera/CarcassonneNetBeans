@@ -3,23 +3,20 @@
 */
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /** @class Peça
     @brief Classe que representa una Peça del Tauler
     @author 
 */
 public class Peça implements Comparable<Peça>{
-    int _x;///< Coordenada X
-    int _y;///< Coordenada Y
-    private String _codi;///< Codi de la peça (x*100+1)
-    private int _nRotacions = 0;///< Nombre de rotacions que se li ha donat a la peça en el moment de col·locar-la
-    private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));///< Llista de Peces adjacents
-    private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null,null));///< Llista de Regions de la Peça
+    int _x; /**< Detailed description after the member */
+    int _y; /**< Coordenada Y */
+    private String _codi; ///< Codi de la peça (x*100+1)
+    private int _nRotacions = 0; ///< Nombre de rotacions que se li ha donat a la peça en el moment de col·locar-la
+    private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null)); ///< Llista de Peces adjacents
+    private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null,null)); ///< Llista de Regions de la Peça
     
     /** @invariant _regions[i] != null per tot i tal que (i>=0 /\ i<=4) excepte en el cas que centre()=='X' on llavors _regions[0]==null /\ _codi és unic per cada Peça
                     /\ _x i _y sempre formen una posició vàlida en el tauler */

@@ -9,11 +9,13 @@ import java.util.Objects;
 */
 public class Regio implements Comparable<Regio> {
     final private int _id;///< Id de la Regio
-    final private char _codi;///< Codi(Lletra) de la Regio
+    final private char _codi;///< Codi(Lletra) de la Regio (F per Camps, V per Viles, C per Camí, M per Monestir)
     private Jugador _seguidor = null;///< Jugador al que pertany el seguidor de la Regio
     private boolean _escut = false;///< Cert si la Regio té escut
-    private Peça _peça;///< Peça a la qual pertany la Regio
-    private Construccio _pertany = null;///< Regio a la qual pertany la Regio
+    private final Peça _peça;///< Peça a la qual pertany la Regio
+    private Construccio _pertany = null;///< Construcció a la qual pertany la Regio
+    
+    /** @invariant _id és únic per cada Regió /\ _escut==true -> _codi=='V' /\ _peça != null  */
     
     /** @brief Constructor de Regio
 	@pre --
@@ -31,7 +33,7 @@ public class Regio implements Comparable<Regio> {
         this._id = _id;
         this._peça = peça;
         this._codi = codi;
-        _escut = escut;
+        this._escut = escut;
     }
     
     @Override

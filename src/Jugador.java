@@ -10,8 +10,8 @@ import java.util.Set;
     @brief Classe Jugador
 */
 /** @class Jugador
-    @brief 
-    @author 
+    @brief Informació d'un Jugador i lògica per la tirada CPU.
+    @author Ferran Capallera
 */
 public class Jugador {
     private int _id;///< Id del Jugador
@@ -71,16 +71,16 @@ public class Jugador {
         _seguidors -= 1;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief retorna \p s seguidors al jugador.
+	@pre s'ha completat una regió.
+	@post seguidors = seguidors + \p s. */
     public void tornarSeguidor(int s){
         _seguidors += s;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief suma \p punts al jugador.
+	@pre cert
+	@post _punts += \p punts. */
     public void sumarPunts(int punts){
         _punts += punts;
     }
@@ -99,8 +99,10 @@ public class Jugador {
         return _seguidors;
     }
     
+    /** @brief Algoritme del càlcul de la millor jugada.
+	@pre és el torn del jugador /\ el jugador és cpu
+	@post Si troba la millor jugada fa una tirada, si no troba cap jugada bona o no pot jugar passa torn. */
     public void tirarCpu(Tauler tauler, Peça peça, Joc joc){
-        System.out.println("La CPU està calculant.");
         Set<Integer> disponibles = tauler.get_disponibles();
         Tirada millor = new Tirada((Posicio)null);
         int heurMillor = 0;
@@ -134,7 +136,9 @@ public class Jugador {
         joc.acabarTorn();
     }
     
-    
+    /** @brief Calcula l'heurística d'una tirada en concret.
+	@pre la tirada és vàlida /\ 
+	@post Retorna l'heurística d'una jugada en concret. */
     private int heuristica(Tauler tauler, Tirada tirada, Peça peça){
         int heuristica = 0;
         int heuristicaSeguidors = 0;
@@ -215,13 +219,18 @@ public class Jugador {
                     }
                 }
             }
+            //Si afegir un seguidor no ens dona cap bonus val més que no l'afegim (penalització)
             if(heuristicaSeguidors == 0) heuristica -= 10;
         }
         
-        
-        return heuristica + (heuristicaSeguidors-1) + tornats * 3;
+        //El fet d'afegir un seguidor ens penalitza una mica. Quantes més peces ens tornin en una tirada més bonus. (Ens dona agilitat de joc)
+        return heuristica + (heuristicaSeguidors-1) + tornats * 2;
     }
     
+    
+    /** @brief Ens diu si aquest jugador té algun seguidor en la construcció \p c.
+	@pre c != null 
+	@post Retorna cert si aquest jugador té un seguidor a la construcció, fals altrament. */
     public boolean teConstruccio(Construccio c){
         if(c instanceof Cami) return _construccions.get("C").contains(c);
         else if(c instanceof Vila) return _construccions.get("V").contains(c);
@@ -229,62 +238,96 @@ public class Jugador {
         else return false;
     }
     
-    
+    /** @brief Ens diu si aquest jugador té algun seguidor en la construcció \p c.
+	@pre c != null 
+	@post Retorna cert si aquest jugador té un seguidor a la construcció, fals altrament. */
     public void addConstruccio(Construccio c){
         if(c instanceof Cami) _construccions.get("C").add(c);
         else if(c instanceof Vila) _construccions.get("V").add(c);
         else if(c instanceof Monestir) _construccions.get("M").add(c);
     }
     
+    
+    /** @brief Elimina la construcció \p c de les construccions del jugador.
+	@pre cert
+	@post nConstruccions = nConstruccions -1, si la construcció existeix. */
     public void removeConstruccio(Construccio c){
         if(c instanceof Cami) _construccions.get("C").remove(c);
         else if(c instanceof Vila) _construccions.get("V").remove(c);
         else if(c instanceof Monestir) _construccions.get("M").remove(c);
     }
     
-    
+    /** @class Tirada
+        @brief Classe auxiliar per computar la CPU. Conté la informació bàsica d'una tirada. (decisió)
+        @author Ferran Capallera
+    */
     private class Tirada {
-        public Posicio posicio;
-        public int rotacio;
-        public int seguidor;
+        public Posicio posicio; ///< Posicio on es jugarà la peça.
+        public int rotacio; ///< Número de vegades que s'ha rotat a partir de la rotació inicial.
+        public int seguidor; ///< Posició on afegirem el seguidor {C,N,E,S,W}
         
+        /** @brief Crea una tirada a partir d'una Posició.
+            @pre cert
+            @post Assigna la Posició, la resta d'atributs s'inicialitzen a null. */
         public Tirada(Posicio posicio){
             this.posicio = posicio;
             this.rotacio = 0;
             this.seguidor = 0;
         }
         
+        /** @brief Constructor de Tirada amb tots els paràmetres.
+            @pre cert
+            @post Crea una Tirada amb tots els atributs inicialitzats. */
         public Tirada(Posicio posicio, int rotacio, int seguidor){
             this.posicio = posicio;
             this.rotacio = rotacio;
             this.seguidor = seguidor;
         }
         
+        
+        /** @brief Constructor de còpia a partir d'una altra Tirada.
+            @pre cert
+            @post Genera una nova tirada a partir d'una altra. (clone) */
         public Tirada(Tirada tirada){
             this.seguidor = tirada.seguidor;
             this.rotacio = tirada.rotacio;
             this.posicio = new Posicio(tirada.posicio._x,tirada.posicio._y);
         }
         
+        /** @brief Dona valor a l'atribut rotacio.
+            @pre cert
+            @post rotacio = \p rot. */
         public void set_rotacio(int rot){
             rotacio = rot;
         }
         
+        /** @brief Dona valor a l'atribut rotacio.
+            @pre cert
+            @post rotacio = \p rot. */
         public void set_seguidor(int seguidor){
             this.seguidor = seguidor;
         }
     }
     
-        
+    /** @class Posicio
+        @brief Classe auxiliar per computar la CPU. Transforma el hashCode d'una peça en la seva x i y.
+        @author Ferran Capallera
+    */
     private class Posicio {
-        public int _x;
-        public int _y;
+        public int _x; ///< Coordenada x
+        public int _y; ///< Coordenada y
         
+        /** @brief Constructor de còpia (x i y).
+            @pre cert
+            @post Crea una nova posició amb la x i la y. */
         public Posicio(int x, int y){
             _x = x;
             _y = y;
         }
         
+        /** @brief Constructor de Posició a partir d'un hashCode.
+            @pre cert
+            @post Crea una nova Posició calculant la x i la y del hashCode. */
         public Posicio(Integer hash){
             double xAppr = hash/100.0;
             _x = (int) Math.round(xAppr);

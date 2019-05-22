@@ -118,7 +118,7 @@ public class Tauler {
         }
     }
     
-    /** @brief El jugador \p actual afageix un seguidor a la peça de (x,y) a la posició pos = {C,N,E,S,W}
+    /** @brief El jugador \p actual afageix un seguidor a la peça de (\p x,\p y) a la posició \p pos = {C,N,E,S,W}
 	@pre la peça s'acaba d'afegir al taulell.
 	@post s'afageix el seguidor del jugador \p actual a la Regió _regions[pos] /\ actual._seguidors-- */
     public void afegirSeguidor(int x, int y, int pos, Jugador actual){
@@ -202,6 +202,9 @@ public class Tauler {
         }
     }
     
+    /** @brief Es procedeix al recompte final tal com estipula a les regles del joc.
+	@pre S'acaba de jugar l'última peça.
+	@post Per cada construcció els jugadors reben els seus respectius punts (les viles compten la meitat) */
     public void recompteFinal(){
         Iterator it = _connexions.entrySet().iterator();
         while(it.hasNext()){
@@ -209,6 +212,7 @@ public class Tauler {
             List<Construccio> llista = (List<Construccio>)pair.getValue();
             for(Construccio c : llista){
                 List<Jugador> puntuadors = c.quiPuntua();
+                //Si és un Vila només puntua la meitat.
                 int punts = ((c instanceof Vila) ? c.puntuar()/2 : c.puntuar());
                 for(Jugador j : puntuadors) j.sumarPunts(punts);
                 c.tornarSeguidors();
@@ -216,17 +220,28 @@ public class Tauler {
         }
     }
     
+    
+    /** @brief Comprova si donada una \p peça, una posició (x,y) i un jugador \p actual, és vàlid afegir un seguidor {-1,C,N,E,S,W}.
+	@pre La peça encara no s'ha colocat, càlcul de la cpu.
+	@post Retorna cert si és vàlid colocar el seguidor, fals altrament. */
     public boolean seguidorValid(Peça peça, int posSeguidor, int x, int y, Jugador jugador){
+        //Si no es vol afegir seguidor (cas -1) surt directament.
         if(posSeguidor==-1) return false;
+        //No es pot afegir un seguidor a un encreuament
         else if(posSeguidor==0 && peça.centre()=='X') return false;
+        //Si és un camp retorna fals (CAMP NO IMPLEMENTAT)
         else if(peça.getRegio(posSeguidor-1).get_codi()=='F') return false;
+        //Sempre es pot afegir un seguidor a un Monestir
         else if(peça.getRegio(posSeguidor-1).get_codi()=='M') return true;
+        //Altrament calcular
         else{
             int idRegio = peça.getRegio(posSeguidor-1).get_id();
+            //Per cada peça adjacent de la regió (Ex: un camí que connecta el Nord amb l'Est).
             for(int i=0;i<4;i++){
                 if(idRegio == peça.getRegio(i).get_id()){
                     int[] hashKeyAdj = {1,100,-1,-100};
                     Peça adjacent = _tauler.get(x*100+y+hashKeyAdj[i]);
+                    //Si hi ha una peça adjacent la construcció no ha d'estar ocupada.
                     if(adjacent!=null){
                         Regio adj = adjacent.getRegio((i+2)%4);
                         Construccio c = adj.get_pertany();
@@ -235,14 +250,21 @@ public class Tauler {
                 }
             }
         }
+        //Si no ha retornat res fins al moment tot OK.
         return true;
     }
     
+    /** @brief Actualitza els monestirs si tenen la \peça al seu {N,NE,E,SE,S,SW,W,NW}.
+	@pre cert
+	@post Treu la \p peça de la llista de pendents dels monestirs (si hi és). */
     private void actualitzarMonestirs(Peça peça){
         List<Construccio> monestirs = _connexions.get("M");
         for(Construccio m : monestirs) m.removePendent(peça.hashCode());
     }
     
+    /** @brief Retorna el set de posicions disponibles.
+	@pre cert
+	@post Retorna el set de posicions disponibles. */
     public Set<Integer> get_disponibles(){
         return _disponibles;
     }

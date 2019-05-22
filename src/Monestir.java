@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /** @class Monestir
-    @brief 
-    @author 
+    @brief Construcció de tipus Monestir
+    @author Ferran Capallera
 */
 public class Monestir extends Construccio {
     /** @brief Constructor de Monestir a partir d'una Regio.
