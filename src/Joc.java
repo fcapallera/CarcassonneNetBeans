@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 /** @file Joc.java
-    @brief Un Tauler de joc dinàmic com si fos un joc de taula. Conté la lògica per afegir peces i controlar tot el que hi ha sobre el tauler.
+    @brief Classe Joc, conté la informació dels Jugador, el tauler de joc. En aquesta classe hi ha el bucle principal del joc i la comunicació amb l'interfície gràfica.
 */
 /** @class Joc
     @brief Classe Joc, conté la informació dels Jugador, el tauler de joc. En aquesta classe hi ha el bucle principal del joc i la comunicació amb l'interfície gràfica.
@@ -17,6 +17,8 @@ public class Joc {
     private final Tauler _tauler; ///< Objecte Tauler
     private int _torn; ///< Índex del torn
     private final CarcassonneGUI _gui; ///< Interfície Gràfica
+    
+    /** @invariant _torn >= 0 /\ _torn < _jugadors.size() /\ _gui != null /\ _tauler != null */
     
     /** @brief Constructor de Joc a partir de la GUI.
 	@pre --

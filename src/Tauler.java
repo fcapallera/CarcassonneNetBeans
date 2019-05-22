@@ -16,6 +16,8 @@ public class Tauler {
     private int _maxY = 0; ///< y de la Peça amb y més gran.
     private int _minY = 0; ///< y de la Peça amb y més petita.
     
+    /** @invariant _disponibles.size() >= 0 /\  No hi ha construccions repetides */
+    
     /** @brief Constructor de Tauler.
 	@pre cert
 	@post Inicialitza les estructures buides. */
