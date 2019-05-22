@@ -1,14 +1,24 @@
 import java.util.*;
 
+/** @file Tauler.java
+    @brief Un Tauler de joc dinàmic com si fos un joc de taula. Conté la lògica per afegir peces i controlar tot el que hi ha sobre el tauler.
+*/
+/** @class Tauler
+    @brief Un Tauler de joc dinàmic com si fos un joc de taula. Conté la lògica per afegir peces i controlar tot el que hi ha sobre el tauler.
+    @author Ferran Capallera
+*/
 public class Tauler {
-    private Map<Integer,Peça> _tauler = new HashMap<>();
-    private Map<String, List<Construccio>> _connexions = new HashMap<>();
-    private Set<Integer> _disponibles = new HashSet<>();
-    private int _maxX = 0;
-    private int _minX = 0;
-    private int _maxY = 0;
-    private int _minY = 0;
-
+    private Map<Integer,Peça> _tauler = new HashMap<>(); ///< Mapa de peces <hashCode,Peça> accés O(1)
+    private Map<String, List<Construccio>> _connexions = new HashMap<>(); ///< Mapa de connexions. Cada clau és un tipus de Construcció (Camí, Vila, Monestir), el valor la llista.
+    private Set<Integer> _disponibles = new HashSet<>(); ///< Set de hashCodes de les peces disponibles (on és vàlid jugar una peça).
+    private int _maxX = 0; ///< x de la Peça amb y més gran.
+    private int _minX = 0; ///< x de la Peça amb x més petita.
+    private int _maxY = 0; ///< y de la Peça amb y més gran.
+    private int _minY = 0; ///< y de la Peça amb y més petita.
+    
+    /** @brief Constructor de Tauler.
+	@pre cert
+	@post Inicialitza les estructures buides. */
     public Tauler(boolean camperols){
         _connexions.put("V",new ArrayList<>());
         _connexions.put("C",new ArrayList<>());
@@ -16,26 +26,45 @@ public class Tauler {
         if(camperols) _connexions.put("F", new ArrayList<>());
     }
     
+    /** @brief Retorna l'estructura del Tauler de joc.
+	@pre cert
+	@post Retorna l'estructura del Tauler de joc. */
     public Map<Integer,Peça> getTauler(){
         return _tauler;
     }
     
+    /** @brief Retorna la cota mínima de x.
+	@pre cert
+	@post Retorna la cota mínima de x. */
     public int getMinX(){
         return _minX;
     }
     
+    /** @brief Retorna la cota màxima de y.
+	@pre cert
+	@post Retorna la cota màxima de y. */
     public int getMaxY(){
         return _maxY;
     }
     
+    /** @brief Ens diu si el tauler conté una Peça.
+	@pre cert
+	@post Retorna cert si la Peça està al tauler, fals altrament. */
     public boolean contains(Peça peça){
         return _tauler.containsKey(peça.hashCode());
     }
     
+    /** @brief Ens diu si el tauler conté un hashCode
+	@pre cert
+	@post Retorna cert si el hashCode està al tauler, fals altrament. */
     public boolean contains(Integer hash){
         return _tauler.containsKey(hash);
     }
     
+    /** @brief Afegeix una Peça al tauler i vincula totes les estructures necessàries.
+	@pre cert
+	@post Afegeix una peça emplenant tots els seus atributs, actualitza les cotes, recalcula les peces disponibles, actualitza les construccions mirant
+              si hi ha hagut una expansió, una fusió amb una altra construcció, o simplement s'ha creat una construcció nova.*/
     public void afegirPeça(Peça peça, int x, int y){
         actualitzarCotes(x,y);
         peça.set_x(x);
