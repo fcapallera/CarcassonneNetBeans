@@ -36,6 +36,9 @@ public class Regio implements Comparable<Regio> {
         this._escut = escut;
     }
     
+    /** @brief Implementació del mètode equals de Regió.
+	@pre cert
+	@post Dos Regions són iguals si tenen el mateix _id . */
     @Override
     public boolean equals(Object other){
         if(other == this) return true;

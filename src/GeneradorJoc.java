@@ -23,13 +23,19 @@ import java.util.Stack;
  * @author Adrià Orellana
  */
 public class GeneradorJoc {
-    String _arxiu;
-    static final String PROVES_SRC = "src/proves/";
+    String _arxiu; ///< Arxiu (sense el format) que carregarem per fer les proves
+    static final String PROVES_SRC = "src/proves/"; ///< Ruta del joc de proves
     
+    /** @brief Constructor a partir d'un arxiu.
+	@pre --
+	@post Crea un GeneradorJoc nou amb l'arxiu inicialitzat. */
     public GeneradorJoc(String arxiu){
         _arxiu = arxiu;
     }
     
+    /** @brief Llegeix l'arxiu de proves i crea un Joc nou.
+	@pre --
+	@post Retorna el nou Joc amb les estructures inicialitzades d'acord amb l'arxiu de proves */
     public Joc generar(CarcassonneGUI gui){
         File f = new File(PROVES_SRC+_arxiu+".txt");
         HashMap<String,Integer> peces = new HashMap<>();

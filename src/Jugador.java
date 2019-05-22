@@ -19,7 +19,7 @@ public class Jugador {
     private boolean _cpu = false;///< Cert si el jugador no és humà
     private int _punts = 0;///< Punts del Jugador
     private int _seguidors = 7;///< Nombre de seguidors restants d'un Jugador
-    private Map<String, List<Construccio>> _construccions = new HashMap<>();
+    private Map<String, List<Construccio>> _construccions = new HashMap<>(); ///< Estructura de _construccions (veure Tauler)
     
     /** @brief Constructor de Jugador
 	@pre --
@@ -31,7 +31,9 @@ public class Jugador {
         _construccions.put("M", new ArrayList<>());
     }
     
-    
+    /** @brief Implementa el mètode equals de Jugador .
+	@pre cert
+	@post Dos jugadors són iguals si tenen el mateix _id . */
     @Override
     public boolean equals(Object other){
         if(other == this) return true;
@@ -133,7 +135,6 @@ public class Jugador {
             tauler.afegirPeça(peça, millor.posicio._x, millor.posicio._y);
             if(millor.seguidor>-1) tauler.afegirSeguidor(millor.posicio._x, millor.posicio._y, millor.seguidor, this);
         }
-        joc.acabarTorn();
     }
     
     /** @brief Calcula l'heurística d'una tirada en concret.

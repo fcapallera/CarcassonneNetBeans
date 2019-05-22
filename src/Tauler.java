@@ -9,7 +9,7 @@ import java.util.*;
 */
 public class Tauler {
     private Map<Integer,Peça> _tauler = new HashMap<>(); ///< Mapa de peces <hashCode,Peça> accés O(1)
-    private Map<String, List<Construccio>> _connexions = new HashMap<>(); ///< Mapa de connexions. Cada clau és un tipus de Construcció (Camí, Vila, Monestir), el valor la llista.
+    private Map<String, List<Construccio>> _connexions = new HashMap<>(); ///< Mapa de connexions. Cada clau és un tipus de Construcció (Cami, Vila, Monestir), el valor la llista.
     private Set<Integer> _disponibles = new HashSet<>(); ///< Set de hashCodes de les peces disponibles (on és vàlid jugar una peça).
     private int _maxX = 0; ///< x de la Peça amb y més gran.
     private int _minX = 0; ///< x de la Peça amb x més petita.
@@ -283,7 +283,7 @@ public class Tauler {
         return true;
     }
     
-    /** @brief Actualitza els monestirs si tenen la \peça al seu {N,NE,E,SE,S,SW,W,NW}.
+    /** @brief Actualitza els monestirs si tenen la \p peça al seu {N,NE,E,SE,S,SW,W,NW}.
 	@pre cert
 	@post Treu la \p peça de la llista de pendents dels monestirs (si hi és). */
     private void actualitzarMonestirs(Peça peça){

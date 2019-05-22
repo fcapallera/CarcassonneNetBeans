@@ -485,7 +485,7 @@ public class CarcassonneGUI extends Application {
             @Override public void handle(ActionEvent e) {
                 refreshBotons(new int[]{0,0,1,0,1,1,1,1,1,1},false);
                 
-                if(!_joc.getPila().isEmpty()){
+                if(_joc.getPila().size()!=1){
                     pila.setVisible(true);
                     Image aux = new Image(CarcassonneGUI.class.getResourceAsStream("tiles/" + _joc.popPila().get_codi() + ".png"));
                     pila.setImage(aux);
