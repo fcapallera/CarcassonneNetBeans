@@ -18,7 +18,7 @@ public class Vila extends Construccio {
 	@post Retorna la puntuació de la Vila */
     @Override
     public int puntuar(){
-        int puntuacio = super.puntuar() * 2;
+        int puntuacio = _regions.size()*2;
         Iterator<Regio> it = _regions.iterator();
         while(it.hasNext()){
             if(it.next().hiHaEscut()) puntuacio += 2;

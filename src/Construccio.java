@@ -8,20 +8,25 @@ import java.util.stream.Stream;
     @brief Representació d'un conjunt de Regions on un Jugador pot posar seguidors. Quan es completa la Construcció, es retornen els seguidors i es puntua per el Jugador que els hi ha posat.
     @author 
 */
-public class Construccio {
+public abstract class Construccio {
     protected Set<Regio> _regions = new HashSet<>();///< Set de Regions
-    protected Map<Jugador,Integer> _seguidors = new HashMap<>();///< Map de seguidors
-    protected Set<Integer> _pendents = new HashSet<>();///< 
-    protected boolean _ocupada = false;///< Cert si la Construccio ja té seguidors d'un altre Jugador
+    protected Map<Jugador,Integer> _seguidors = new HashMap<>();///< Map on <Jugador , nº seguidors dintre la construcció>
+    protected Set<Integer> _pendents = new HashSet<>();///< Set de posicions (hash) que s'han de tapar per completar la construcció 
+    protected boolean _ocupada = false;///< Cert si la Construccio té algun seguidor
     
-    /** @brief Constructor de Construccio
-	@pre 
-	@post  */
+    /** @invariant _ocupada == true <-> !_seguidors.isEmpty() */
+    
+    /** @brief Constructor de Construccio a partir d'una Regió.
+	@pre \p regio != null
+	@post crea una construcció amb una Regió inicialitzada. Emplena la variable _pertany de regió amb la Construcció creada. */
     public Construccio(Regio regio){
         addRegio(regio);
         regio.set_pertany(this);
     }
     
+    /** @brief Implementació del mètode equals.
+	@pre cert
+	@post retorna cert si les dues construccions tenen les mateixes regions. */
     @Override
     public boolean equals(Object other){
         if(other == this) return true;
@@ -33,16 +38,14 @@ public class Construccio {
         return _regions.equals(c.get_regions());
     }
     
-    /** @brief Retorna el tamany del Set de Regions
-	@pre 
-	@post  */
-    public int puntuar(){
-        return _regions.size();
-    }
+    /** @brief Retorna els punts que val la construcció
+	@pre cert
+	@post cada subclasse té la seva implementació. */
+    public abstract int puntuar();
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Retorna la llista de seguidors que s'emportaran els punts de la construcció.
+	@pre cert
+	@post si _ocupada == false retorna llista buida, el jugador o jugadors que puntuen altrament. */
     public List<Jugador> quiPuntua(){
         int maxSeg = 0;
         ArrayList<Jugador> puntuadors = new ArrayList<>();
@@ -57,9 +60,9 @@ public class Construccio {
         return puntuadors;
     }
     
-    /** @brief Elimina els seguidors de la Construccio i reinicialitza els contenidors
-	@pre 
-	@post  */
+    /** @brief Retorna els seguidors que tenia i buida el camp _pertany de les regions que hi havia.
+	@pre cert
+	@post regio._seguidor == null (per cada seguidor de _seguidors) /\ _jugador._seguidors  += _seguidors[_jugador] (per cada jugador a _seguidors). */
     public void tornarSeguidors(){
         for(Map.Entry<Jugador,Integer> entry : _seguidors.entrySet()){
             entry.getKey().tornarSeguidor(entry.getValue());
@@ -72,8 +75,8 @@ public class Construccio {
     }
     
     /** @brief Fusiona dues Construccions
-	@pre 
-	@post  */
+	@pre Una peça ("rajola") uneix més d'una construcció alhora.
+	@post Es fusionen les construccions segons l'algoritme explicat a la documentació. */
     public void fusionar(Construccio c){
         _regions.addAll(c.get_regions());
         if(c.ocupada()) _ocupada = true;

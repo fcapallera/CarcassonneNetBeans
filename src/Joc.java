@@ -1,13 +1,6 @@
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 import java.util.Stack;
 
 /*
@@ -24,10 +17,10 @@ public class Joc {
 
     private Stack<Peça> _peces;
     private List<Jugador> _jugadors;
-    private Tauler _tauler;
+    private final Tauler _tauler;
     private int _torn;
     private boolean _jugat;
-    private CarcassonneGUI _gui;
+    private final CarcassonneGUI _gui;
     
     public Joc(CarcassonneGUI gui){
         _peces = new Stack<Peça>();

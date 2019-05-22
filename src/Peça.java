@@ -21,25 +21,28 @@ public class Peça implements Comparable<Peça>{
     private List<Peça> _adjacents = new ArrayList<>(Arrays.asList(null,null,null,null));///< Llista de Peces adjacents
     private List<Regio> _regions = new ArrayList<>(Arrays.asList(null,null,null,null,null));///< Llista de Regions de la Peça
     
+    /** @invariant _regions[i] != null per tot i tal que (i>=0 /\ i<=4) excepte en el cas que centre()=='X' on llavors _regions[0]==null /\ _codi és unic per cada Peça
+                    /\ _x i _y sempre formen una posició vàlida en el tauler */
+    
     /** @brief Es sobreescriu el mètode compareTo que ens compara el hashCode de les Peces
-	@pre 
-	@post  */
+	@pre \p other té x i y inicialitzades
+	@post retorna el resultat de comparar els hashcodes */
     @Override
     public int compareTo(Peça other){
         return new Integer(this.hashCode()).compareTo(other.hashCode());
     }
     
     /** @brief Ens retorna el hashCode de la Peça que s'obté a partir de la x i la y
-	@pre 
-	@post  */
+	@pre cert
+	@post retorna hashCode = x*100+y */
     @Override
     public int hashCode() {
         return _x*100+_y;
     }
 
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Implementació del mètode equals
+	@pre cert
+	@post retorna cert si els hashcodes coincideixen, fals altrament */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -61,16 +64,16 @@ public class Peça implements Comparable<Peça>{
         return Objects.equals(this._codi, other._codi);
     }
 
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Crea una peça a partir del codi
+	@pre cert
+	@post x i y no estan assignats, regions i peces s'inicialitzen a null amb 5 i 4 posicions respectivament. */
     public Peça(String _codi) {
         this._codi = _codi;
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Crea una peça a partir de la posició i el codi
+	@pre cert
+	@post  x i y assignats, regions i peces s'inicialitzen a null amb 5 i 4 posicions respectivament.*/
     public Peça(int _x, int _y, String _codi) {
         this._x = _x;
         this._y = _y;
@@ -78,8 +81,8 @@ public class Peça implements Comparable<Peça>{
     }
     
     /** @brief Aplica una rotació de -90 graus a la Peça, canviant les seves Regions
-	@pre --
-	@post _nRotacions++ i regions canviades girant 90º la peça */
+	@pre cert
+	@post incrementa l'índex de rotació. La regió central es manté i les altres efectuen una rotació de -90º. */
     public void rotarClockWise(){
         //String nouCodi = ""+_codi.charAt(0)+_codi.charAt(4)+_codi.charAt(1)+_codi.charAt(2)+_codi.charAt(3);
         //_codi = nouCodi;
@@ -91,14 +94,16 @@ public class Peça implements Comparable<Peça>{
         _nRotacions = (_nRotacions+1)%4;
     }
     
-    
+    /** @brief Rota la peça fins que el seu índex de posició coincideix amb pos
+	@pre (0 <= \p pos) /\ (3 >= \p pos)
+	@post incrementa l'índex de rotació. La regió central es manté i les altres efectuen una rotació de -90º. */
     public void rotarFins(int pos){
         while(_nRotacions != pos) rotarClockWise();
     }
     
     /** @brief Ens mira si la peça actual és compatible, en l'orientació passada per paràmetres, amb la Peça també passada per paràmetres
-	@pre --
-	@post Retorna cert si l'orientació de la Peça actual i l'orientació oposada de la Peça passada per peràmetres són iguals */
+	@pre (0 <= \p orientacio) /\ (3 >= \p orientacio)
+	@post Retorna cert si codi de les regions coincidex en la peça adjacent \p orientacio */
     public boolean esCompatible(Peça peça, int orientacio){
         return _regions.get(orientacio+1).get_codi() == peça.getRegio((orientacio+2)%4).get_codi();
     }
@@ -113,7 +118,7 @@ public class Peça implements Comparable<Peça>{
     
     /** @brief Retorna la Regió de la Peça actual amb índex a {CNESW=01234}
 	@pre --
-	@post Retorna la Regio _regions[a] */
+	@post Retorna la Regio _regions[r+1] */
     public Regio getRegio(int r){
         if(r < -1 || r > 4) throw new IndexOutOfBoundsException("Index "+r+" is out of bounds");
         else return _regions.get(r+1);
@@ -126,9 +131,9 @@ public class Peça implements Comparable<Peça>{
         _regions.get(i).setSeguidor(seguidor);
     }
     
-    /** @brief 
-	@pre 
-	@post  */
+    /** @brief Crea les regions a partir del codi de la peça. Algoritme explicat a la documentació.
+	@pre cert
+	@post S'han creat les regions segons l'algoritme. Retorna el nombre de Regions que s'hagin creat */
     public int afegirRegions(int nReg){
         int n = 0;
         char c = centre();
@@ -209,7 +214,7 @@ public class Peça implements Comparable<Peça>{
     }
     
     
-    /** @brief Retorna el char de la Regio CENTRE
+    /** @brief Retorna el char de la Regio CENTRE (0)
 	@pre --
 	@post Retorna el char de la Regio centre */
     public char centre(){ return _codi.charAt(0);}
@@ -259,29 +264,29 @@ public class Peça implements Comparable<Peça>{
     
     
     /** @brief Canvia la coordenada X de la Peça
-	@pre --
-	@post La x passada per paràmetres és la _x de la Peça */
+	@pre cert
+	@post _x = x */
     public void set_x(int _x) {
         this._x = _x;
     }
     
     /** @brief Retorna la coordenada Y de la Peça
-	@pre --
+	@pre cert
 	@post Retorna _y */
     public int get_y() {
         return _y;
     }
     
     /** @brief Canvia la coordenada Y de la Peça 
-	@pre --
-	@post La x passada per paràmetres es la _y de la Peça */
+	@pre cert
+	@post _y = y */
     public void set_y(int _y) {
         this._y = _y;
     }
     
     /** @brief Retorna l'index de rotacio de la Peça
 	@pre --
-	@post Retorna _nRotacions%4 */
+	@post Retorna _nRotacions */
     public int getIndexRotacio(){
         return _nRotacions;
     }

@@ -152,7 +152,7 @@ public class Jugador {
             if(pendents.contains(100*x+y)){
                 heuristica += 10 - pendents.size();
                 if(pendents.size()==1) tornats++;
-            }       
+            }
         }
         
         //Expandeix construccions que són nostres

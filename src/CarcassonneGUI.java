@@ -93,8 +93,7 @@ public class CarcassonneGUI extends Application {
 	@post Components de la GUI inicialitzats*/
     @Override
     public void start(Stage primaryStage) {
-        _generador = new GeneradorJoc("1");
-        
+        _generador = new GeneradorJoc("1");  
         _primaryStage = primaryStage;
         row = 3;
         col = 3;
